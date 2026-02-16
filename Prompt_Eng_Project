@@ -1,0 +1,554 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "p1-5mxnJfP8A",
+        "outputId": "84187db0-bc51-40ce-9186-31f71694fe39"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: google-generativeai==0.8.6 in /usr/local/lib/python3.12/dist-packages (0.8.6)\n",
+            "Requirement already satisfied: google-ai-generativelanguage==0.6.15 in /usr/local/lib/python3.12/dist-packages (from google-generativeai==0.8.6) (0.6.15)\n",
+            "Requirement already satisfied: google-api-core in /usr/local/lib/python3.12/dist-packages (from google-generativeai==0.8.6) (2.29.0)\n",
+            "Requirement already satisfied: google-api-python-client in /usr/local/lib/python3.12/dist-packages (from google-generativeai==0.8.6) (2.189.0)\n",
+            "Requirement already satisfied: google-auth>=2.15.0 in /usr/local/lib/python3.12/dist-packages (from google-generativeai==0.8.6) (2.47.0)\n",
+            "Requirement already satisfied: protobuf in /usr/local/lib/python3.12/dist-packages (from google-generativeai==0.8.6) (5.29.6)\n",
+            "Requirement already satisfied: pydantic in /usr/local/lib/python3.12/dist-packages (from google-generativeai==0.8.6) (2.12.3)\n",
+            "Requirement already satisfied: tqdm in /usr/local/lib/python3.12/dist-packages (from google-generativeai==0.8.6) (4.67.3)\n",
+            "Requirement already satisfied: typing-extensions in /usr/local/lib/python3.12/dist-packages (from google-generativeai==0.8.6) (4.15.0)\n",
+            "Requirement already satisfied: proto-plus<2.0.0dev,>=1.22.3 in /usr/local/lib/python3.12/dist-packages (from google-ai-generativelanguage==0.6.15->google-generativeai==0.8.6) (1.27.1)\n",
+            "Requirement already satisfied: googleapis-common-protos<2.0.0,>=1.56.2 in /usr/local/lib/python3.12/dist-packages (from google-api-core->google-generativeai==0.8.6) (1.72.0)\n",
+            "Requirement already satisfied: requests<3.0.0,>=2.18.0 in /usr/local/lib/python3.12/dist-packages (from google-api-core->google-generativeai==0.8.6) (2.32.4)\n",
+            "Requirement already satisfied: pyasn1-modules>=0.2.1 in /usr/local/lib/python3.12/dist-packages (from google-auth>=2.15.0->google-generativeai==0.8.6) (0.4.2)\n",
+            "Requirement already satisfied: rsa<5,>=3.1.4 in /usr/local/lib/python3.12/dist-packages (from google-auth>=2.15.0->google-generativeai==0.8.6) (4.9.1)\n",
+            "Requirement already satisfied: httplib2<1.0.0,>=0.19.0 in /usr/local/lib/python3.12/dist-packages (from google-api-python-client->google-generativeai==0.8.6) (0.31.2)\n",
+            "Requirement already satisfied: google-auth-httplib2<1.0.0,>=0.2.0 in /usr/local/lib/python3.12/dist-packages (from google-api-python-client->google-generativeai==0.8.6) (0.3.0)\n",
+            "Requirement already satisfied: uritemplate<5,>=3.0.1 in /usr/local/lib/python3.12/dist-packages (from google-api-python-client->google-generativeai==0.8.6) (4.2.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic->google-generativeai==0.8.6) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic->google-generativeai==0.8.6) (2.41.4)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic->google-generativeai==0.8.6) (0.4.2)\n",
+            "Requirement already satisfied: grpcio<2.0.0,>=1.33.2 in /usr/local/lib/python3.12/dist-packages (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-ai-generativelanguage==0.6.15->google-generativeai==0.8.6) (1.76.0)\n",
+            "Requirement already satisfied: grpcio-status<2.0.0,>=1.33.2 in /usr/local/lib/python3.12/dist-packages (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-ai-generativelanguage==0.6.15->google-generativeai==0.8.6) (1.71.2)\n",
+            "Requirement already satisfied: pyparsing<4,>=3.1 in /usr/local/lib/python3.12/dist-packages (from httplib2<1.0.0,>=0.19.0->google-api-python-client->google-generativeai==0.8.6) (3.3.2)\n",
+            "Requirement already satisfied: pyasn1<0.7.0,>=0.6.1 in /usr/local/lib/python3.12/dist-packages (from pyasn1-modules>=0.2.1->google-auth>=2.15.0->google-generativeai==0.8.6) (0.6.2)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.18.0->google-api-core->google-generativeai==0.8.6) (3.4.4)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.18.0->google-api-core->google-generativeai==0.8.6) (3.11)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.18.0->google-api-core->google-generativeai==0.8.6) (2.5.0)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.18.0->google-api-core->google-generativeai==0.8.6) (2026.1.4)\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install google-generativeai==0.8.6"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from getpass import getpass\n",
+        "\n",
+        "GOOGLE_API_KEY = getpass('Enter Gemini API Key:')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "INDUScX9faZT",
+        "outputId": "475c5b06-0a42-4063-e7e4-ae2b514d0ebc"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Enter Gemini API Key:··········\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import google.generativeai as genai\n",
+        "\n",
+        "genai.configure(api_key=GOOGLE_API_KEY)\n",
+        "\n",
+        "for m in genai.list_models():\n",
+        "  if 'generateContent' in m.supported_generation_methods:\n",
+        "    print(m.name)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 694
+        },
+        "id": "TQIpuXvcfe2C",
+        "outputId": "0ca3575b-3077-4269-d385-347f5d83c04a"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "/usr/local/lib/python3.12/dist-packages/google/colab/_import_hooks/_hook_injector.py:55: FutureWarning: \n",
+            "\n",
+            "All support for the `google.generativeai` package has ended. It will no longer be receiving \n",
+            "updates or bug fixes. Please switch to the `google.genai` package as soon as possible.\n",
+            "See README for more details:\n",
+            "\n",
+            "https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md\n",
+            "\n",
+            "  loader.exec_module(module)\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "models/gemini-2.5-flash\n",
+            "models/gemini-2.5-pro\n",
+            "models/gemini-2.0-flash\n",
+            "models/gemini-2.0-flash-001\n",
+            "models/gemini-2.0-flash-exp-image-generation\n",
+            "models/gemini-2.0-flash-lite-001\n",
+            "models/gemini-2.0-flash-lite\n",
+            "models/gemini-exp-1206\n",
+            "models/gemini-2.5-flash-preview-tts\n",
+            "models/gemini-2.5-pro-preview-tts\n",
+            "models/gemma-3-1b-it\n",
+            "models/gemma-3-4b-it\n",
+            "models/gemma-3-12b-it\n",
+            "models/gemma-3-27b-it\n",
+            "models/gemma-3n-e4b-it\n",
+            "models/gemma-3n-e2b-it\n",
+            "models/gemini-flash-latest\n",
+            "models/gemini-flash-lite-latest\n",
+            "models/gemini-pro-latest\n",
+            "models/gemini-2.5-flash-lite\n",
+            "models/gemini-2.5-flash-image\n",
+            "models/gemini-2.5-flash-preview-09-2025\n",
+            "models/gemini-2.5-flash-lite-preview-09-2025\n",
+            "models/gemini-3-pro-preview\n",
+            "models/gemini-3-flash-preview\n",
+            "models/gemini-3-pro-image-preview\n",
+            "models/nano-banana-pro-preview\n",
+            "models/gemini-robotics-er-1.5-preview\n",
+            "models/gemini-2.5-computer-use-preview-10-2025\n",
+            "models/deep-research-pro-preview-12-2025\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "generation_config = genai.types.GenerationConfig(\n",
+        "    temperature=0\n",
+        ")\n",
+        "gemini = genai.GenerativeModel(model_name='gemini-2.0-flash',\n",
+        "                               generation_config=generation_config)"
+      ],
+      "metadata": {
+        "id": "B9zQJ0vofkvm"
+      },
+      "execution_count": 69,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!wget -O 'io4MWPr7RxatdXVG01PX_Problem Statement_ Financial Image Scans (1).pdf' YOUR_PDF_DOWNLOAD_URL_HERE"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "IqJX4V_bfpaW",
+        "outputId": "30745ea3-2b33-485b-888b-3b91aa858b4e"
+      },
+      "execution_count": 70,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "--2026-02-16 23:02:19--  http://your_pdf_download_url_here/\n",
+            "Resolving your_pdf_download_url_here (your_pdf_download_url_here)... failed: Name or service not known.\n",
+            "wget: unable to resolve host address ‘your_pdf_download_url_here’\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 107
+        },
+        "id": "a2e05096",
+        "outputId": "bdc574c1-8462-4de8-a0fa-2935e3a8315c"
+      },
+      "source": [
+        "from google.colab import files\n",
+        "\n",
+        "print(\"Please upload your PDF file (e.g., 'io4MWPr7RxatdXVG01PX_Problem Statement_ Financial Image Scans (1).pdf') now:\")\n",
+        "uploaded = files.upload()\n",
+        "\n",
+        "# Get the actual filename that was uploaded\n",
+        "if uploaded:\n",
+        "    uploaded_filename = list(uploaded.keys())[0]\n",
+        "    print(f\"File '{uploaded_filename}' uploaded successfully!\")\n",
+        "else:\n",
+        "    uploaded_filename = None\n",
+        "    print(\"No file was uploaded.\")"
+      ],
+      "execution_count": 71,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Please upload your PDF file (e.g., 'io4MWPr7RxatdXVG01PX_Problem Statement_ Financial Image Scans (1).pdf') now:\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<IPython.core.display.HTML object>"
+            ],
+            "text/html": [
+              "\n",
+              "     <input type=\"file\" id=\"files-f3cad2e0-f283-4c3b-8285-4c35207bb9ed\" name=\"files[]\" multiple disabled\n",
+              "        style=\"border:none\" />\n",
+              "     <output id=\"result-f3cad2e0-f283-4c3b-8285-4c35207bb9ed\">\n",
+              "      Upload widget is only available when the cell has been executed in the\n",
+              "      current browser session. Please rerun this cell to enable.\n",
+              "      </output>\n",
+              "      <script>// Copyright 2017 Google LLC\n",
+              "//\n",
+              "// Licensed under the Apache License, Version 2.0 (the \"License\");\n",
+              "// you may not use this file except in compliance with the License.\n",
+              "// You may obtain a copy of the License at\n",
+              "//\n",
+              "//      http://www.apache.org/licenses/LICENSE-2.0\n",
+              "//\n",
+              "// Unless required by applicable law or agreed to in writing, software\n",
+              "// distributed under the License is distributed on an \"AS IS\" BASIS,\n",
+              "// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n",
+              "// See the License for the specific language governing permissions and\n",
+              "// limitations under the License.\n",
+              "\n",
+              "/**\n",
+              " * @fileoverview Helpers for google.colab Python module.\n",
+              " */\n",
+              "(function(scope) {\n",
+              "function span(text, styleAttributes = {}) {\n",
+              "  const element = document.createElement('span');\n",
+              "  element.textContent = text;\n",
+              "  for (const key of Object.keys(styleAttributes)) {\n",
+              "    element.style[key] = styleAttributes[key];\n",
+              "  }\n",
+              "  return element;\n",
+              "}\n",
+              "\n",
+              "// Max number of bytes which will be uploaded at a time.\n",
+              "const MAX_PAYLOAD_SIZE = 100 * 1024;\n",
+              "\n",
+              "function _uploadFiles(inputId, outputId) {\n",
+              "  const steps = uploadFilesStep(inputId, outputId);\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  // Cache steps on the outputElement to make it available for the next call\n",
+              "  // to uploadFilesContinue from Python.\n",
+              "  outputElement.steps = steps;\n",
+              "\n",
+              "  return _uploadFilesContinue(outputId);\n",
+              "}\n",
+              "\n",
+              "// This is roughly an async generator (not supported in the browser yet),\n",
+              "// where there are multiple asynchronous steps and the Python side is going\n",
+              "// to poll for completion of each step.\n",
+              "// This uses a Promise to block the python side on completion of each step,\n",
+              "// then passes the result of the previous step as the input to the next step.\n",
+              "function _uploadFilesContinue(outputId) {\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  const steps = outputElement.steps;\n",
+              "\n",
+              "  const next = steps.next(outputElement.lastPromiseValue);\n",
+              "  return Promise.resolve(next.value.promise).then((value) => {\n",
+              "    // Cache the last promise value to make it available to the next\n",
+              "    // step of the generator.\n",
+              "    outputElement.lastPromiseValue = value;\n",
+              "    return next.value.response;\n",
+              "  });\n",
+              "}\n",
+              "\n",
+              "/**\n",
+              " * Generator function which is called between each async step of the upload\n",
+              " * process.\n",
+              " * @param {string} inputId Element ID of the input file picker element.\n",
+              " * @param {string} outputId Element ID of the output display.\n",
+              " * @return {!Iterable<!Object>} Iterable of next steps.\n",
+              " */\n",
+              "function* uploadFilesStep(inputId, outputId) {\n",
+              "  const inputElement = document.getElementById(inputId);\n",
+              "  inputElement.disabled = false;\n",
+              "\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  outputElement.innerHTML = '';\n",
+              "\n",
+              "  const pickedPromise = new Promise((resolve) => {\n",
+              "    inputElement.addEventListener('change', (e) => {\n",
+              "      resolve(e.target.files);\n",
+              "    });\n",
+              "  });\n",
+              "\n",
+              "  const cancel = document.createElement('button');\n",
+              "  inputElement.parentElement.appendChild(cancel);\n",
+              "  cancel.textContent = 'Cancel upload';\n",
+              "  const cancelPromise = new Promise((resolve) => {\n",
+              "    cancel.onclick = () => {\n",
+              "      resolve(null);\n",
+              "    };\n",
+              "  });\n",
+              "\n",
+              "  // Wait for the user to pick the files.\n",
+              "  const files = yield {\n",
+              "    promise: Promise.race([pickedPromise, cancelPromise]),\n",
+              "    response: {\n",
+              "      action: 'starting',\n",
+              "    }\n",
+              "  };\n",
+              "\n",
+              "  cancel.remove();\n",
+              "\n",
+              "  // Disable the input element since further picks are not allowed.\n",
+              "  inputElement.disabled = true;\n",
+              "\n",
+              "  if (!files) {\n",
+              "    return {\n",
+              "      response: {\n",
+              "        action: 'complete',\n",
+              "      }\n",
+              "    };\n",
+              "  }\n",
+              "\n",
+              "  for (const file of files) {\n",
+              "    const li = document.createElement('li');\n",
+              "    li.append(span(file.name, {fontWeight: 'bold'}));\n",
+              "    li.append(span(\n",
+              "        `(${file.type || 'n/a'}) - ${file.size} bytes, ` +\n",
+              "        `last modified: ${\n",
+              "            file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() :\n",
+              "                                    'n/a'} - `));\n",
+              "    const percent = span('0% done');\n",
+              "    li.appendChild(percent);\n",
+              "\n",
+              "    outputElement.appendChild(li);\n",
+              "\n",
+              "    const fileDataPromise = new Promise((resolve) => {\n",
+              "      const reader = new FileReader();\n",
+              "      reader.onload = (e) => {\n",
+              "        resolve(e.target.result);\n",
+              "      };\n",
+              "      reader.readAsArrayBuffer(file);\n",
+              "    });\n",
+              "    // Wait for the data to be ready.\n",
+              "    let fileData = yield {\n",
+              "      promise: fileDataPromise,\n",
+              "      response: {\n",
+              "        action: 'continue',\n",
+              "      }\n",
+              "    };\n",
+              "\n",
+              "    // Use a chunked sending to avoid message size limits. See b/62115660.\n",
+              "    let position = 0;\n",
+              "    do {\n",
+              "      const length = Math.min(fileData.byteLength - position, MAX_PAYLOAD_SIZE);\n",
+              "      const chunk = new Uint8Array(fileData, position, length);\n",
+              "      position += length;\n",
+              "\n",
+              "      const base64 = btoa(String.fromCharCode.apply(null, chunk));\n",
+              "      yield {\n",
+              "        response: {\n",
+              "          action: 'append',\n",
+              "          file: file.name,\n",
+              "          data: base64,\n",
+              "        },\n",
+              "      };\n",
+              "\n",
+              "      let percentDone = fileData.byteLength === 0 ?\n",
+              "          100 :\n",
+              "          Math.round((position / fileData.byteLength) * 100);\n",
+              "      percent.textContent = `${percentDone}% done`;\n",
+              "\n",
+              "    } while (position < fileData.byteLength);\n",
+              "  }\n",
+              "\n",
+              "  // All done.\n",
+              "  yield {\n",
+              "    response: {\n",
+              "      action: 'complete',\n",
+              "    }\n",
+              "  };\n",
+              "}\n",
+              "\n",
+              "scope.google = scope.google || {};\n",
+              "scope.google.colab = scope.google.colab || {};\n",
+              "scope.google.colab._files = {\n",
+              "  _uploadFiles,\n",
+              "  _uploadFilesContinue,\n",
+              "};\n",
+              "})(self);\n",
+              "</script> "
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Saving io4MWPr7RxatdXVG01PX_Problem Statement_ Financial Image Scans (1).pdf to io4MWPr7RxatdXVG01PX_Problem Statement_ Financial Image Scans (1) (7).pdf\n",
+            "File 'io4MWPr7RxatdXVG01PX_Problem Statement_ Financial Image Scans (1) (7).pdf' uploaded successfully!\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 225
+        },
+        "id": "da2d0691",
+        "outputId": "7f2344d2-04ad-4b28-b81f-52c9b51b7b3c"
+      },
+      "source": [
+        "if uploaded_filename:\n",
+        "    pdf_ref = genai.upload_file(path=f'./{uploaded_filename}')\n",
+        "    print(pdf_ref)\n",
+        "else:\n",
+        "    print(\"No file was uploaded in the previous step. Cannot upload to Generative AI.\")"
+      ],
+      "execution_count": 72,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "genai.File({\n",
+            "    'name': 'files/vm7jr7ar8x14',\n",
+            "    'display_name': 'io4MWPr7RxatdXVG01PX_Problem Statement_ Financial Image '\n",
+            "                    'Scans (1) (7).pdf',\n",
+            "    'mime_type': 'application/pdf',\n",
+            "    'sha256_hash': 'ZjM3MTlmNWQxN2ZhNzA5ZWI2NjlmNGVjMGVlOGZjODIxZWQ5ZDQ4YzVhODI3YzA5ZDBmZDkwZjQzZDEyMDA3YQ==',\n",
+            "    'size_bytes': '271767',\n",
+            "    'state': 'ACTIVE',\n",
+            "    'uri': 'https://generativelanguage.googleapis.com/v1beta/files/vm7jr7ar8x14',\n",
+            "    'create_time': '2026-02-16T23:02:27.433948Z',\n",
+            "    'expiration_time': '2026-02-18T23:02:27.238366231Z',\n",
+            "    'update_time': '2026-02-16T23:02:27.433948Z'})\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 460
+        },
+        "id": "f89b76d6",
+        "outputId": "21ed1bc1-f3f3-4cc2-ae00-475e3e60d1f6"
+      },
+      "source": [
+        "from IPython.display import Markdown\n",
+        "\n",
+        "prompt = \"\"\"\n",
+        "  ● Extracts and highlights critical information from financial document image, such as key\n",
+        "  financial metrics, trends, and risks\n",
+        "  ● Summarize complex financial content into concise, easy-to-understand insights tailored\n",
+        "  to the user’s requirements (e.g., investors, analysts, or auditors).\n",
+        "  ● Enables users to focus on actionable insights, reducing time spent on document review\n",
+        "  and improving decision-making efficiency.\n",
+        "  ● Is able to analyze the graphs and charts present inside the documents and give outputs\n",
+        "based on it.\n",
+        "\n",
+        "\"\"\"\n",
+        "contents = [pdf_ref, prompt]\n",
+        "\n",
+        "response = gemini.generate_content(contents)\n",
+        "\n",
+        "Markdown(response.text)"
+      ],
+      "execution_count": 73,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "WARNING:tornado.access:429 POST /v1beta/models/gemini-2.0-flash:generateContent?%24alt=json%3Benum-encoding%3Dint (::1) 406.38ms\n"
+          ]
+        },
+        {
+          "output_type": "error",
+          "ename": "TooManyRequests",
+          "evalue": "429 POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?%24alt=json%3Benum-encoding%3Dint: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\nPlease retry in 29.544028246s.",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mTooManyRequests\u001b[0m                           Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipython-input-2289452777.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m     14\u001b[0m \u001b[0mcontents\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m[\u001b[0m\u001b[0mpdf_ref\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mprompt\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     15\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 16\u001b[0;31m \u001b[0mresponse\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mgemini\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgenerate_content\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcontents\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     17\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     18\u001b[0m \u001b[0mMarkdown\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mresponse\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtext\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/google/generativeai/generative_models.py\u001b[0m in \u001b[0;36mgenerate_content\u001b[0;34m(self, contents, generation_config, safety_settings, stream, tools, tool_config, request_options)\u001b[0m\n\u001b[1;32m    329\u001b[0m                 \u001b[0;32mreturn\u001b[0m \u001b[0mgeneration_types\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mGenerateContentResponse\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfrom_iterator\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0miterator\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    330\u001b[0m             \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 331\u001b[0;31m                 response = self._client.generate_content(\n\u001b[0m\u001b[1;32m    332\u001b[0m                     \u001b[0mrequest\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    333\u001b[0m                     \u001b[0;34m**\u001b[0m\u001b[0mrequest_options\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/google/ai/generativelanguage_v1beta/services/generative_service/client.py\u001b[0m in \u001b[0;36mgenerate_content\u001b[0;34m(self, request, model, contents, retry, timeout, metadata)\u001b[0m\n\u001b[1;32m    833\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    834\u001b[0m         \u001b[0;31m# Send the request.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 835\u001b[0;31m         response = rpc(\n\u001b[0m\u001b[1;32m    836\u001b[0m             \u001b[0mrequest\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    837\u001b[0m             \u001b[0mretry\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mretry\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/google/api_core/gapic_v1/method.py\u001b[0m in \u001b[0;36m__call__\u001b[0;34m(self, timeout, retry, compression, *args, **kwargs)\u001b[0m\n\u001b[1;32m    129\u001b[0m             \u001b[0mkwargs\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m\"compression\"\u001b[0m\u001b[0;34m]\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcompression\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    130\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 131\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0mwrapped_func\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    132\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    133\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/google/api_core/retry/retry_unary.py\u001b[0m in \u001b[0;36mretry_wrapped_func\u001b[0;34m(*args, **kwargs)\u001b[0m\n\u001b[1;32m    292\u001b[0m                 \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_initial\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_maximum\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mmultiplier\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_multiplier\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    293\u001b[0m             )\n\u001b[0;32m--> 294\u001b[0;31m             return retry_target(\n\u001b[0m\u001b[1;32m    295\u001b[0m                 \u001b[0mtarget\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    296\u001b[0m                 \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_predicate\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/google/api_core/retry/retry_unary.py\u001b[0m in \u001b[0;36mretry_target\u001b[0;34m(target, predicate, sleep_generator, timeout, on_error, exception_factory, **kwargs)\u001b[0m\n\u001b[1;32m    154\u001b[0m         \u001b[0;32mexcept\u001b[0m \u001b[0mException\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mexc\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    155\u001b[0m             \u001b[0;31m# defer to shared logic for handling errors\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 156\u001b[0;31m             next_sleep = _retry_error_helper(\n\u001b[0m\u001b[1;32m    157\u001b[0m                 \u001b[0mexc\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    158\u001b[0m                 \u001b[0mdeadline\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/google/api_core/retry/retry_base.py\u001b[0m in \u001b[0;36m_retry_error_helper\u001b[0;34m(exc, deadline, sleep_iterator, error_list, predicate_fn, on_error_fn, exc_factory_fn, original_timeout)\u001b[0m\n\u001b[1;32m    212\u001b[0m             \u001b[0moriginal_timeout\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    213\u001b[0m         )\n\u001b[0;32m--> 214\u001b[0;31m         \u001b[0;32mraise\u001b[0m \u001b[0mfinal_exc\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0msource_exc\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    215\u001b[0m     \u001b[0;32mif\u001b[0m \u001b[0mon_error_fn\u001b[0m \u001b[0;32mis\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32mNone\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    216\u001b[0m         \u001b[0mon_error_fn\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mexc\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/google/api_core/retry/retry_unary.py\u001b[0m in \u001b[0;36mretry_target\u001b[0;34m(target, predicate, sleep_generator, timeout, on_error, exception_factory, **kwargs)\u001b[0m\n\u001b[1;32m    145\u001b[0m     \u001b[0;32mwhile\u001b[0m \u001b[0;32mTrue\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    146\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 147\u001b[0;31m             \u001b[0mresult\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mtarget\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    148\u001b[0m             \u001b[0;32mif\u001b[0m \u001b[0minspect\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0misawaitable\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mresult\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    149\u001b[0m                 \u001b[0mwarnings\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mwarn\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0m_ASYNC_RETRY_WARNING\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/google/api_core/timeout.py\u001b[0m in \u001b[0;36mfunc_with_timeout\u001b[0;34m(*args, **kwargs)\u001b[0m\n\u001b[1;32m    128\u001b[0m                 \u001b[0mkwargs\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m\"timeout\"\u001b[0m\u001b[0;34m]\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mremaining_timeout\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    129\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 130\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mfunc\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    131\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    132\u001b[0m         \u001b[0;32mreturn\u001b[0m \u001b[0mfunc_with_timeout\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/google/api_core/grpc_helpers.py\u001b[0m in \u001b[0;36merror_remapped_callable\u001b[0;34m(*args, **kwargs)\u001b[0m\n\u001b[1;32m     73\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0merror_remapped_callable\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     74\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 75\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mcallable_\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     76\u001b[0m         \u001b[0;32mexcept\u001b[0m \u001b[0mgrpc\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mRpcError\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mexc\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     77\u001b[0m             \u001b[0;32mraise\u001b[0m \u001b[0mexceptions\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfrom_grpc_error\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mexc\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0mexc\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/google/ai/generativelanguage_v1beta/services/generative_service/transports/rest.py\u001b[0m in \u001b[0;36m__call__\u001b[0;34m(self, request, retry, timeout, metadata)\u001b[0m\n\u001b[1;32m   1159\u001b[0m             \u001b[0;31m# subclass.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1160\u001b[0m             \u001b[0;32mif\u001b[0m \u001b[0mresponse\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mstatus_code\u001b[0m \u001b[0;34m>=\u001b[0m \u001b[0;36m400\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1161\u001b[0;31m                 \u001b[0;32mraise\u001b[0m \u001b[0mcore_exceptions\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfrom_http_response\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mresponse\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1162\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1163\u001b[0m             \u001b[0;31m# Return the response\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mTooManyRequests\u001b[0m: 429 POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?%24alt=json%3Benum-encoding%3Dint: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\nPlease retry in 29.544028246s."
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "-UuUAgnEl6Va"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
