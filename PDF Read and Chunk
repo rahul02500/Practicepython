@@ -1,0 +1,1219 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/rahul02500/Practicepython/blob/main/PDF%20Read%20and%20Chunk\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install langchain\n",
+        "!pip install langchain-openai\n",
+        "!pip install langchain-community\n",
+        "!pip install langchain-huggingface\n",
+        "!pip install jq\n",
+        "!pip install pymupdf\n",
+        "!pip install langchain-textsplitters"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "collapsed": true,
+        "id": "PWt18Bcf64cx",
+        "outputId": "6cc44c4e-a9d4-4279-f592-e58c95a9cfcd"
+      },
+      "execution_count": 29,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: langchain in /usr/local/lib/python3.12/dist-packages (1.2.10)\n",
+            "Requirement already satisfied: langchain-core<2.0.0,>=1.2.10 in /usr/local/lib/python3.12/dist-packages (from langchain) (1.2.13)\n",
+            "Requirement already satisfied: langgraph<1.1.0,>=1.0.8 in /usr/local/lib/python3.12/dist-packages (from langchain) (1.0.8)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.7.4 in /usr/local/lib/python3.12/dist-packages (from langchain) (2.12.3)\n",
+            "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.10->langchain) (1.33)\n",
+            "Requirement already satisfied: langsmith<1.0.0,>=0.3.45 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.10->langchain) (0.7.3)\n",
+            "Requirement already satisfied: packaging>=23.2.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.10->langchain) (26.0)\n",
+            "Requirement already satisfied: pyyaml<7.0.0,>=5.3.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.10->langchain) (6.0.3)\n",
+            "Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.10->langchain) (9.1.4)\n",
+            "Requirement already satisfied: typing-extensions<5.0.0,>=4.7.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.10->langchain) (4.15.0)\n",
+            "Requirement already satisfied: uuid-utils<1.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.10->langchain) (0.14.0)\n",
+            "Requirement already satisfied: langgraph-checkpoint<5.0.0,>=2.1.0 in /usr/local/lib/python3.12/dist-packages (from langgraph<1.1.0,>=1.0.8->langchain) (4.0.0)\n",
+            "Requirement already satisfied: langgraph-prebuilt<1.1.0,>=1.0.7 in /usr/local/lib/python3.12/dist-packages (from langgraph<1.1.0,>=1.0.8->langchain) (1.0.7)\n",
+            "Requirement already satisfied: langgraph-sdk<0.4.0,>=0.3.0 in /usr/local/lib/python3.12/dist-packages (from langgraph<1.1.0,>=1.0.8->langchain) (0.3.6)\n",
+            "Requirement already satisfied: xxhash>=3.5.0 in /usr/local/lib/python3.12/dist-packages (from langgraph<1.1.0,>=1.0.8->langchain) (3.6.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain) (2.41.4)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain) (0.4.2)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.12/dist-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<2.0.0,>=1.2.10->langchain) (3.0.0)\n",
+            "Requirement already satisfied: ormsgpack>=1.12.0 in /usr/local/lib/python3.12/dist-packages (from langgraph-checkpoint<5.0.0,>=2.1.0->langgraph<1.1.0,>=1.0.8->langchain) (1.12.2)\n",
+            "Requirement already satisfied: httpx>=0.25.2 in /usr/local/lib/python3.12/dist-packages (from langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.1.0,>=1.0.8->langchain) (0.28.1)\n",
+            "Requirement already satisfied: orjson>=3.10.1 in /usr/local/lib/python3.12/dist-packages (from langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.1.0,>=1.0.8->langchain) (3.11.7)\n",
+            "Requirement already satisfied: requests-toolbelt>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.10->langchain) (1.0.0)\n",
+            "Requirement already satisfied: requests>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.10->langchain) (2.32.5)\n",
+            "Requirement already satisfied: zstandard>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.10->langchain) (0.25.0)\n",
+            "Requirement already satisfied: anyio in /usr/local/lib/python3.12/dist-packages (from httpx>=0.25.2->langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.1.0,>=1.0.8->langchain) (4.12.1)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx>=0.25.2->langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.1.0,>=1.0.8->langchain) (2026.1.4)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx>=0.25.2->langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.1.0,>=1.0.8->langchain) (1.0.9)\n",
+            "Requirement already satisfied: idna in /usr/local/lib/python3.12/dist-packages (from httpx>=0.25.2->langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.1.0,>=1.0.8->langchain) (3.11)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx>=0.25.2->langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.1.0,>=1.0.8->langchain) (0.16.0)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.10->langchain) (3.4.4)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.10->langchain) (2.5.0)\n",
+            "Requirement already satisfied: langchain-openai in /usr/local/lib/python3.12/dist-packages (1.1.10)\n",
+            "Requirement already satisfied: langchain-core<2.0.0,>=1.2.13 in /usr/local/lib/python3.12/dist-packages (from langchain-openai) (1.2.13)\n",
+            "Requirement already satisfied: openai<3.0.0,>=2.20.0 in /usr/local/lib/python3.12/dist-packages (from langchain-openai) (2.21.0)\n",
+            "Requirement already satisfied: tiktoken<1.0.0,>=0.7.0 in /usr/local/lib/python3.12/dist-packages (from langchain-openai) (0.12.0)\n",
+            "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-openai) (1.33)\n",
+            "Requirement already satisfied: langsmith<1.0.0,>=0.3.45 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-openai) (0.7.3)\n",
+            "Requirement already satisfied: packaging>=23.2.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-openai) (26.0)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.7.4 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-openai) (2.12.3)\n",
+            "Requirement already satisfied: pyyaml<7.0.0,>=5.3.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-openai) (6.0.3)\n",
+            "Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-openai) (9.1.4)\n",
+            "Requirement already satisfied: typing-extensions<5.0.0,>=4.7.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-openai) (4.15.0)\n",
+            "Requirement already satisfied: uuid-utils<1.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-openai) (0.14.0)\n",
+            "Requirement already satisfied: anyio<5,>=3.5.0 in /usr/local/lib/python3.12/dist-packages (from openai<3.0.0,>=2.20.0->langchain-openai) (4.12.1)\n",
+            "Requirement already satisfied: distro<2,>=1.7.0 in /usr/local/lib/python3.12/dist-packages (from openai<3.0.0,>=2.20.0->langchain-openai) (1.9.0)\n",
+            "Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from openai<3.0.0,>=2.20.0->langchain-openai) (0.28.1)\n",
+            "Requirement already satisfied: jiter<1,>=0.10.0 in /usr/local/lib/python3.12/dist-packages (from openai<3.0.0,>=2.20.0->langchain-openai) (0.13.0)\n",
+            "Requirement already satisfied: sniffio in /usr/local/lib/python3.12/dist-packages (from openai<3.0.0,>=2.20.0->langchain-openai) (1.3.1)\n",
+            "Requirement already satisfied: tqdm>4 in /usr/local/lib/python3.12/dist-packages (from openai<3.0.0,>=2.20.0->langchain-openai) (4.67.3)\n",
+            "Requirement already satisfied: regex>=2022.1.18 in /usr/local/lib/python3.12/dist-packages (from tiktoken<1.0.0,>=0.7.0->langchain-openai) (2025.11.3)\n",
+            "Requirement already satisfied: requests>=2.26.0 in /usr/local/lib/python3.12/dist-packages (from tiktoken<1.0.0,>=0.7.0->langchain-openai) (2.32.5)\n",
+            "Requirement already satisfied: idna>=2.8 in /usr/local/lib/python3.12/dist-packages (from anyio<5,>=3.5.0->openai<3.0.0,>=2.20.0->langchain-openai) (3.11)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->openai<3.0.0,>=2.20.0->langchain-openai) (2026.1.4)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->openai<3.0.0,>=2.20.0->langchain-openai) (1.0.9)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->openai<3.0.0,>=2.20.0->langchain-openai) (0.16.0)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.12/dist-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<2.0.0,>=1.2.13->langchain-openai) (3.0.0)\n",
+            "Requirement already satisfied: orjson>=3.9.14 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-openai) (3.11.7)\n",
+            "Requirement already satisfied: requests-toolbelt>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-openai) (1.0.0)\n",
+            "Requirement already satisfied: xxhash>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-openai) (3.6.0)\n",
+            "Requirement already satisfied: zstandard>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-openai) (0.25.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.2.13->langchain-openai) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.2.13->langchain-openai) (2.41.4)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.2.13->langchain-openai) (0.4.2)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests>=2.26.0->tiktoken<1.0.0,>=0.7.0->langchain-openai) (3.4.4)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests>=2.26.0->tiktoken<1.0.0,>=0.7.0->langchain-openai) (2.5.0)\n",
+            "Requirement already satisfied: langchain-community in /usr/local/lib/python3.12/dist-packages (0.4.1)\n",
+            "Requirement already satisfied: langchain-core<2.0.0,>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (1.2.13)\n",
+            "Requirement already satisfied: langchain-classic<2.0.0,>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (1.0.1)\n",
+            "Requirement already satisfied: SQLAlchemy<3.0.0,>=1.4.0 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (2.0.46)\n",
+            "Requirement already satisfied: requests<3.0.0,>=2.32.5 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (2.32.5)\n",
+            "Requirement already satisfied: PyYAML<7.0.0,>=5.3.0 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (6.0.3)\n",
+            "Requirement already satisfied: aiohttp<4.0.0,>=3.8.3 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (3.13.3)\n",
+            "Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (9.1.4)\n",
+            "Requirement already satisfied: dataclasses-json<0.7.0,>=0.6.7 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (0.6.7)\n",
+            "Requirement already satisfied: pydantic-settings<3.0.0,>=2.10.1 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (2.13.0)\n",
+            "Requirement already satisfied: langsmith<1.0.0,>=0.1.125 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (0.7.3)\n",
+            "Requirement already satisfied: httpx-sse<1.0.0,>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (0.4.3)\n",
+            "Requirement already satisfied: numpy>=1.26.2 in /usr/local/lib/python3.12/dist-packages (from langchain-community) (2.0.2)\n",
+            "Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (2.6.1)\n",
+            "Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (1.4.0)\n",
+            "Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (25.4.0)\n",
+            "Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (1.8.0)\n",
+            "Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (6.7.1)\n",
+            "Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (0.4.1)\n",
+            "Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (1.22.0)\n",
+            "Requirement already satisfied: marshmallow<4.0.0,>=3.18.0 in /usr/local/lib/python3.12/dist-packages (from dataclasses-json<0.7.0,>=0.6.7->langchain-community) (3.26.2)\n",
+            "Requirement already satisfied: typing-inspect<1,>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from dataclasses-json<0.7.0,>=0.6.7->langchain-community) (0.9.0)\n",
+            "Requirement already satisfied: langchain-text-splitters<2.0.0,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from langchain-classic<2.0.0,>=1.0.0->langchain-community) (1.1.1)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.7.4 in /usr/local/lib/python3.12/dist-packages (from langchain-classic<2.0.0,>=1.0.0->langchain-community) (2.12.3)\n",
+            "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.0.1->langchain-community) (1.33)\n",
+            "Requirement already satisfied: packaging>=23.2.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.0.1->langchain-community) (26.0)\n",
+            "Requirement already satisfied: typing-extensions<5.0.0,>=4.7.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.0.1->langchain-community) (4.15.0)\n",
+            "Requirement already satisfied: uuid-utils<1.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.0.1->langchain-community) (0.14.0)\n",
+            "Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.1.125->langchain-community) (0.28.1)\n",
+            "Requirement already satisfied: orjson>=3.9.14 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.1.125->langchain-community) (3.11.7)\n",
+            "Requirement already satisfied: requests-toolbelt>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.1.125->langchain-community) (1.0.0)\n",
+            "Requirement already satisfied: xxhash>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.1.125->langchain-community) (3.6.0)\n",
+            "Requirement already satisfied: zstandard>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.1.125->langchain-community) (0.25.0)\n",
+            "Requirement already satisfied: python-dotenv>=0.21.0 in /usr/local/lib/python3.12/dist-packages (from pydantic-settings<3.0.0,>=2.10.1->langchain-community) (1.2.1)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from pydantic-settings<3.0.0,>=2.10.1->langchain-community) (0.4.2)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.32.5->langchain-community) (3.4.4)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.32.5->langchain-community) (3.11)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.32.5->langchain-community) (2.5.0)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.32.5->langchain-community) (2026.1.4)\n",
+            "Requirement already satisfied: greenlet>=1 in /usr/local/lib/python3.12/dist-packages (from SQLAlchemy<3.0.0,>=1.4.0->langchain-community) (3.3.1)\n",
+            "Requirement already satisfied: anyio in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.1.125->langchain-community) (4.12.1)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.1.125->langchain-community) (1.0.9)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->langsmith<1.0.0,>=0.1.125->langchain-community) (0.16.0)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.12/dist-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<2.0.0,>=1.0.1->langchain-community) (3.0.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-classic<2.0.0,>=1.0.0->langchain-community) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-classic<2.0.0,>=1.0.0->langchain-community) (2.41.4)\n",
+            "Requirement already satisfied: mypy-extensions>=0.3.0 in /usr/local/lib/python3.12/dist-packages (from typing-inspect<1,>=0.4.0->dataclasses-json<0.7.0,>=0.6.7->langchain-community) (1.1.0)\n",
+            "Requirement already satisfied: langchain-huggingface in /usr/local/lib/python3.12/dist-packages (1.2.0)\n",
+            "Requirement already satisfied: huggingface-hub<1.0.0,>=0.33.4 in /usr/local/lib/python3.12/dist-packages (from langchain-huggingface) (0.36.2)\n",
+            "Requirement already satisfied: langchain-core<2.0.0,>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from langchain-huggingface) (1.2.13)\n",
+            "Requirement already satisfied: tokenizers<1.0.0,>=0.19.1 in /usr/local/lib/python3.12/dist-packages (from langchain-huggingface) (0.22.2)\n",
+            "Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (3.24.2)\n",
+            "Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (2025.3.0)\n",
+            "Requirement already satisfied: hf-xet<2.0.0,>=1.1.3 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (1.2.0)\n",
+            "Requirement already satisfied: packaging>=20.9 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (26.0)\n",
+            "Requirement already satisfied: pyyaml>=5.1 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (6.0.3)\n",
+            "Requirement already satisfied: requests in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (2.32.5)\n",
+            "Requirement already satisfied: tqdm>=4.42.1 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (4.67.3)\n",
+            "Requirement already satisfied: typing-extensions>=3.7.4.3 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (4.15.0)\n",
+            "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (1.33)\n",
+            "Requirement already satisfied: langsmith<1.0.0,>=0.3.45 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (0.7.3)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.7.4 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (2.12.3)\n",
+            "Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (9.1.4)\n",
+            "Requirement already satisfied: uuid-utils<1.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (0.14.0)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.12/dist-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (3.0.0)\n",
+            "Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (0.28.1)\n",
+            "Requirement already satisfied: orjson>=3.9.14 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (3.11.7)\n",
+            "Requirement already satisfied: requests-toolbelt>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (1.0.0)\n",
+            "Requirement already satisfied: xxhash>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (3.6.0)\n",
+            "Requirement already satisfied: zstandard>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (0.25.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (2.41.4)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (0.4.2)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests->huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (3.4.4)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests->huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (3.11)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests->huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (2.5.0)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests->huggingface-hub<1.0.0,>=0.33.4->langchain-huggingface) (2026.1.4)\n",
+            "Requirement already satisfied: anyio in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (4.12.1)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (1.0.9)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.0->langchain-huggingface) (0.16.0)\n",
+            "Requirement already satisfied: jq in /usr/local/lib/python3.12/dist-packages (1.11.0)\n",
+            "Requirement already satisfied: pymupdf in /usr/local/lib/python3.12/dist-packages (1.27.1)\n",
+            "\u001b[31mERROR: Could not find a version that satisfies the requirement langchain-textsplitters (from versions: none)\u001b[0m\u001b[31m\n",
+            "\u001b[0m\u001b[31mERROR: No matching distribution found for langchain-textsplitters\u001b[0m\u001b[31m\n",
+            "\u001b[0m"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install langchain-chroma\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "collapsed": true,
+        "id": "ATEh80qG7HaW",
+        "outputId": "80f713de-4d3a-40a6-c181-df8f07615c63"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting langchain-chroma\n",
+            "  Downloading langchain_chroma-1.1.0-py3-none-any.whl.metadata (1.9 kB)\n",
+            "Collecting chromadb<2.0.0,>=1.3.5 (from langchain-chroma)\n",
+            "  Downloading chromadb-1.5.1-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.2 kB)\n",
+            "Requirement already satisfied: langchain-core<2.0.0,>=1.1.3 in /usr/local/lib/python3.12/dist-packages (from langchain-chroma) (1.2.13)\n",
+            "Requirement already satisfied: numpy>=1.26.0 in /usr/local/lib/python3.12/dist-packages (from langchain-chroma) (2.0.2)\n",
+            "Collecting build>=1.0.3 (from chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading build-1.4.0-py3-none-any.whl.metadata (5.8 kB)\n",
+            "Requirement already satisfied: pydantic>=1.9 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (2.12.3)\n",
+            "Collecting pybase64>=1.4.1 (from chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading pybase64-1.4.3-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl.metadata (8.7 kB)\n",
+            "Requirement already satisfied: uvicorn>=0.18.3 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.41.0)\n",
+            "Collecting posthog<6.0.0,>=2.4.0 (from chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading posthog-5.4.0-py3-none-any.whl.metadata (5.7 kB)\n",
+            "Requirement already satisfied: typing-extensions>=4.5.0 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (4.15.0)\n",
+            "Collecting onnxruntime>=1.14.1 (from chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading onnxruntime-1.24.2-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (5.0 kB)\n",
+            "Requirement already satisfied: opentelemetry-api>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.38.0)\n",
+            "Collecting opentelemetry-exporter-otlp-proto-grpc>=1.2.0 (from chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading opentelemetry_exporter_otlp_proto_grpc-1.39.1-py3-none-any.whl.metadata (2.5 kB)\n",
+            "Requirement already satisfied: opentelemetry-sdk>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.38.0)\n",
+            "Requirement already satisfied: tokenizers>=0.13.2 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.22.2)\n",
+            "Collecting pypika>=0.48.9 (from chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading pypika-0.51.1-py2.py3-none-any.whl.metadata (51 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m52.0/52.0 kB\u001b[0m \u001b[31m2.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: tqdm>=4.65.0 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (4.67.3)\n",
+            "Requirement already satisfied: overrides>=7.3.1 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (7.7.0)\n",
+            "Requirement already satisfied: importlib-resources in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (6.5.2)\n",
+            "Requirement already satisfied: grpcio>=1.58.0 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.78.0)\n",
+            "Collecting bcrypt>=4.0.1 (from chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading bcrypt-5.0.0-cp39-abi3-manylinux_2_34_x86_64.whl.metadata (10 kB)\n",
+            "Requirement already satisfied: typer>=0.9.0 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.24.0)\n",
+            "Collecting kubernetes>=28.1.0 (from chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading kubernetes-35.0.0-py2.py3-none-any.whl.metadata (1.7 kB)\n",
+            "Requirement already satisfied: tenacity>=8.2.3 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (9.1.4)\n",
+            "Requirement already satisfied: pyyaml>=6.0.0 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (6.0.3)\n",
+            "Requirement already satisfied: mmh3>=4.0.1 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (5.2.0)\n",
+            "Requirement already satisfied: orjson>=3.9.12 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (3.11.7)\n",
+            "Requirement already satisfied: httpx>=0.27.0 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.28.1)\n",
+            "Requirement already satisfied: rich>=10.11.0 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (13.9.4)\n",
+            "Requirement already satisfied: jsonschema>=4.19.0 in /usr/local/lib/python3.12/dist-packages (from chromadb<2.0.0,>=1.3.5->langchain-chroma) (4.26.0)\n",
+            "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.1.3->langchain-chroma) (1.33)\n",
+            "Requirement already satisfied: langsmith<1.0.0,>=0.3.45 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.1.3->langchain-chroma) (0.7.3)\n",
+            "Requirement already satisfied: packaging>=23.2.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.1.3->langchain-chroma) (26.0)\n",
+            "Requirement already satisfied: uuid-utils<1.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.1.3->langchain-chroma) (0.14.0)\n",
+            "Collecting pyproject_hooks (from build>=1.0.3->chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading pyproject_hooks-1.2.0-py3-none-any.whl.metadata (1.3 kB)\n",
+            "Requirement already satisfied: anyio in /usr/local/lib/python3.12/dist-packages (from httpx>=0.27.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (4.12.1)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx>=0.27.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (2026.1.4)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx>=0.27.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.0.9)\n",
+            "Requirement already satisfied: idna in /usr/local/lib/python3.12/dist-packages (from httpx>=0.27.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (3.11)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx>=0.27.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.16.0)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.12/dist-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<2.0.0,>=1.1.3->langchain-chroma) (3.0.0)\n",
+            "Requirement already satisfied: attrs>=22.2.0 in /usr/local/lib/python3.12/dist-packages (from jsonschema>=4.19.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (25.4.0)\n",
+            "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /usr/local/lib/python3.12/dist-packages (from jsonschema>=4.19.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (2025.9.1)\n",
+            "Requirement already satisfied: referencing>=0.28.4 in /usr/local/lib/python3.12/dist-packages (from jsonschema>=4.19.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.37.0)\n",
+            "Requirement already satisfied: rpds-py>=0.25.0 in /usr/local/lib/python3.12/dist-packages (from jsonschema>=4.19.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.30.0)\n",
+            "Requirement already satisfied: six>=1.9.0 in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.17.0)\n",
+            "Requirement already satisfied: python-dateutil>=2.5.3 in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (2.9.0.post0)\n",
+            "Requirement already satisfied: websocket-client!=0.40.0,!=0.41.*,!=0.42.*,>=0.32.0 in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.9.0)\n",
+            "Requirement already satisfied: requests in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (2.32.5)\n",
+            "Requirement already satisfied: requests-oauthlib in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (2.0.0)\n",
+            "Requirement already satisfied: urllib3!=2.6.0,>=1.24.2 in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (2.5.0)\n",
+            "Collecting durationpy>=0.7 (from kubernetes>=28.1.0->chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading durationpy-0.10-py3-none-any.whl.metadata (340 bytes)\n",
+            "Requirement already satisfied: requests-toolbelt>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.1.3->langchain-chroma) (1.0.0)\n",
+            "Requirement already satisfied: xxhash>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.1.3->langchain-chroma) (3.6.0)\n",
+            "Requirement already satisfied: zstandard>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.1.3->langchain-chroma) (0.25.0)\n",
+            "Requirement already satisfied: flatbuffers in /usr/local/lib/python3.12/dist-packages (from onnxruntime>=1.14.1->chromadb<2.0.0,>=1.3.5->langchain-chroma) (25.12.19)\n",
+            "Requirement already satisfied: protobuf in /usr/local/lib/python3.12/dist-packages (from onnxruntime>=1.14.1->chromadb<2.0.0,>=1.3.5->langchain-chroma) (5.29.6)\n",
+            "Requirement already satisfied: sympy in /usr/local/lib/python3.12/dist-packages (from onnxruntime>=1.14.1->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.14.0)\n",
+            "Requirement already satisfied: importlib-metadata<8.8.0,>=6.0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-api>=1.2.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (8.7.1)\n",
+            "Requirement already satisfied: googleapis-common-protos~=1.57 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.72.0)\n",
+            "Collecting opentelemetry-exporter-otlp-proto-common==1.39.1 (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading opentelemetry_exporter_otlp_proto_common-1.39.1-py3-none-any.whl.metadata (1.8 kB)\n",
+            "Collecting opentelemetry-proto==1.39.1 (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading opentelemetry_proto-1.39.1-py3-none-any.whl.metadata (2.3 kB)\n",
+            "Collecting opentelemetry-sdk>=1.2.0 (from chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading opentelemetry_sdk-1.39.1-py3-none-any.whl.metadata (1.5 kB)\n",
+            "Collecting opentelemetry-api>=1.2.0 (from chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading opentelemetry_api-1.39.1-py3-none-any.whl.metadata (1.5 kB)\n",
+            "Collecting opentelemetry-semantic-conventions==0.60b1 (from opentelemetry-sdk>=1.2.0->chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading opentelemetry_semantic_conventions-0.60b1-py3-none-any.whl.metadata (2.4 kB)\n",
+            "Collecting backoff>=1.10.0 (from posthog<6.0.0,>=2.4.0->chromadb<2.0.0,>=1.3.5->langchain-chroma)\n",
+            "  Downloading backoff-2.2.1-py3-none-any.whl.metadata (14 kB)\n",
+            "Requirement already satisfied: distro>=1.5.0 in /usr/local/lib/python3.12/dist-packages (from posthog<6.0.0,>=2.4.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.9.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic>=1.9->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic>=1.9->chromadb<2.0.0,>=1.3.5->langchain-chroma) (2.41.4)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic>=1.9->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.4.2)\n",
+            "Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from rich>=10.11.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (4.0.0)\n",
+            "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.12/dist-packages (from rich>=10.11.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (2.19.2)\n",
+            "Requirement already satisfied: huggingface-hub<2.0,>=0.16.4 in /usr/local/lib/python3.12/dist-packages (from tokenizers>=0.13.2->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.36.2)\n",
+            "Requirement already satisfied: click>=8.2.1 in /usr/local/lib/python3.12/dist-packages (from typer>=0.9.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (8.3.1)\n",
+            "Requirement already satisfied: shellingham>=1.3.0 in /usr/local/lib/python3.12/dist-packages (from typer>=0.9.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.5.4)\n",
+            "Requirement already satisfied: annotated-doc>=0.0.2 in /usr/local/lib/python3.12/dist-packages (from typer>=0.9.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.0.4)\n",
+            "Requirement already satisfied: httptools>=0.6.3 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.7.1)\n",
+            "Requirement already satisfied: python-dotenv>=0.13 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.2.1)\n",
+            "Requirement already satisfied: uvloop>=0.15.1 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.22.1)\n",
+            "Requirement already satisfied: watchfiles>=0.20 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.1.1)\n",
+            "Requirement already satisfied: websockets>=10.4 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb<2.0.0,>=1.3.5->langchain-chroma) (15.0.1)\n",
+            "Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb<2.0.0,>=1.3.5->langchain-chroma) (3.24.2)\n",
+            "Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb<2.0.0,>=1.3.5->langchain-chroma) (2025.3.0)\n",
+            "Requirement already satisfied: hf-xet<2.0.0,>=1.1.3 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.2.0)\n",
+            "Requirement already satisfied: zipp>=3.20 in /usr/local/lib/python3.12/dist-packages (from importlib-metadata<8.8.0,>=6.0->opentelemetry-api>=1.2.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (3.23.0)\n",
+            "Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.12/dist-packages (from markdown-it-py>=2.2.0->rich>=10.11.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (0.1.2)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests->kubernetes>=28.1.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (3.4.4)\n",
+            "Requirement already satisfied: oauthlib>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from requests-oauthlib->kubernetes>=28.1.0->chromadb<2.0.0,>=1.3.5->langchain-chroma) (3.3.1)\n",
+            "Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy->onnxruntime>=1.14.1->chromadb<2.0.0,>=1.3.5->langchain-chroma) (1.3.0)\n",
+            "Downloading langchain_chroma-1.1.0-py3-none-any.whl (12 kB)\n",
+            "Downloading chromadb-1.5.1-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (21.5 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m21.5/21.5 MB\u001b[0m \u001b[31m58.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading bcrypt-5.0.0-cp39-abi3-manylinux_2_34_x86_64.whl (278 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m278.2/278.2 kB\u001b[0m \u001b[31m18.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading build-1.4.0-py3-none-any.whl (24 kB)\n",
+            "Downloading kubernetes-35.0.0-py2.py3-none-any.whl (2.0 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m2.0/2.0 MB\u001b[0m \u001b[31m69.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading onnxruntime-1.24.2-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (17.1 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m17.1/17.1 MB\u001b[0m \u001b[31m67.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading opentelemetry_exporter_otlp_proto_grpc-1.39.1-py3-none-any.whl (19 kB)\n",
+            "Downloading opentelemetry_exporter_otlp_proto_common-1.39.1-py3-none-any.whl (18 kB)\n",
+            "Downloading opentelemetry_proto-1.39.1-py3-none-any.whl (72 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m72.5/72.5 kB\u001b[0m \u001b[31m5.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading opentelemetry_sdk-1.39.1-py3-none-any.whl (132 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m132.6/132.6 kB\u001b[0m \u001b[31m9.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading opentelemetry_api-1.39.1-py3-none-any.whl (66 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m66.4/66.4 kB\u001b[0m \u001b[31m4.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading opentelemetry_semantic_conventions-0.60b1-py3-none-any.whl (219 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m220.0/220.0 kB\u001b[0m \u001b[31m11.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading posthog-5.4.0-py3-none-any.whl (105 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m105.4/105.4 kB\u001b[0m \u001b[31m5.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading pybase64-1.4.3-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl (71 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m71.6/71.6 kB\u001b[0m \u001b[31m5.7 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading pypika-0.51.1-py2.py3-none-any.whl (60 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m60.6/60.6 kB\u001b[0m \u001b[31m3.2 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading backoff-2.2.1-py3-none-any.whl (15 kB)\n",
+            "Downloading durationpy-0.10-py3-none-any.whl (3.9 kB)\n",
+            "Downloading pyproject_hooks-1.2.0-py3-none-any.whl (10 kB)\n",
+            "Installing collected packages: pypika, durationpy, pyproject_hooks, pybase64, opentelemetry-proto, bcrypt, backoff, posthog, opentelemetry-exporter-otlp-proto-common, opentelemetry-api, onnxruntime, build, opentelemetry-semantic-conventions, kubernetes, opentelemetry-sdk, opentelemetry-exporter-otlp-proto-grpc, chromadb, langchain-chroma\n",
+            "  Attempting uninstall: opentelemetry-proto\n",
+            "    Found existing installation: opentelemetry-proto 1.38.0\n",
+            "    Uninstalling opentelemetry-proto-1.38.0:\n",
+            "      Successfully uninstalled opentelemetry-proto-1.38.0\n",
+            "  Attempting uninstall: opentelemetry-exporter-otlp-proto-common\n",
+            "    Found existing installation: opentelemetry-exporter-otlp-proto-common 1.38.0\n",
+            "    Uninstalling opentelemetry-exporter-otlp-proto-common-1.38.0:\n",
+            "      Successfully uninstalled opentelemetry-exporter-otlp-proto-common-1.38.0\n",
+            "  Attempting uninstall: opentelemetry-api\n",
+            "    Found existing installation: opentelemetry-api 1.38.0\n",
+            "    Uninstalling opentelemetry-api-1.38.0:\n",
+            "      Successfully uninstalled opentelemetry-api-1.38.0\n",
+            "  Attempting uninstall: opentelemetry-semantic-conventions\n",
+            "    Found existing installation: opentelemetry-semantic-conventions 0.59b0\n",
+            "    Uninstalling opentelemetry-semantic-conventions-0.59b0:\n",
+            "      Successfully uninstalled opentelemetry-semantic-conventions-0.59b0\n",
+            "  Attempting uninstall: opentelemetry-sdk\n",
+            "    Found existing installation: opentelemetry-sdk 1.38.0\n",
+            "    Uninstalling opentelemetry-sdk-1.38.0:\n",
+            "      Successfully uninstalled opentelemetry-sdk-1.38.0\n",
+            "\u001b[31mERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n",
+            "opentelemetry-exporter-gcp-logging 1.11.0a0 requires opentelemetry-sdk<1.39.0,>=1.35.0, but you have opentelemetry-sdk 1.39.1 which is incompatible.\n",
+            "opentelemetry-exporter-otlp-proto-http 1.38.0 requires opentelemetry-exporter-otlp-proto-common==1.38.0, but you have opentelemetry-exporter-otlp-proto-common 1.39.1 which is incompatible.\n",
+            "opentelemetry-exporter-otlp-proto-http 1.38.0 requires opentelemetry-proto==1.38.0, but you have opentelemetry-proto 1.39.1 which is incompatible.\n",
+            "opentelemetry-exporter-otlp-proto-http 1.38.0 requires opentelemetry-sdk~=1.38.0, but you have opentelemetry-sdk 1.39.1 which is incompatible.\u001b[0m\u001b[31m\n",
+            "\u001b[0mSuccessfully installed backoff-2.2.1 bcrypt-5.0.0 build-1.4.0 chromadb-1.5.1 durationpy-0.10 kubernetes-35.0.0 langchain-chroma-1.1.0 onnxruntime-1.24.2 opentelemetry-api-1.39.1 opentelemetry-exporter-otlp-proto-common-1.39.1 opentelemetry-exporter-otlp-proto-grpc-1.39.1 opentelemetry-proto-1.39.1 opentelemetry-sdk-1.39.1 opentelemetry-semantic-conventions-0.60b1 posthog-5.4.0 pybase64-1.4.3 pypika-0.51.1 pyproject_hooks-1.2.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from getpass import getpass\n",
+        "\n",
+        "OPENAI_KEY = getpass('Enter Open AI API Key:')\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "AAtQZYEV7Xs2",
+        "outputId": "af3145d9-c8b4-4d0b-a2aa-6cd549019782"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Enter Open AI API Key:··········\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_openai import OpenAIEmbeddings\n",
+        "\n",
+        "openai_embed_model = OpenAIEmbeddings(model=\"text-embedding-3-small\", openai_api_key=OPENAI_KEY)"
+      ],
+      "metadata": {
+        "id": "Tw6zD4Di7lrE"
+      },
+      "execution_count": 7,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!gdown 1aZxZejfteVuofISodUrY2CDoyuPLYDGZ"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xlJK3J7D8D1a",
+        "outputId": "f0178c99-85b6-461c-f517-1f2e6093ad68"
+      },
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Downloading...\n",
+            "From: https://drive.google.com/uc?id=1aZxZejfteVuofISodUrY2CDoyuPLYDGZ\n",
+            "To: /content/rag_docs.zip\n",
+            "\r  0% 0.00/5.92M [00:00<?, ?B/s]\r100% 5.92M/5.92M [00:00<00:00, 111MB/s]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!unzip rag_docs.zip"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "collapsed": true,
+        "id": "P1zgz28BBZlG",
+        "outputId": "09652e31-be52-4c60-ad0a-7a953017434f"
+      },
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Archive:  rag_docs.zip\n",
+            "   creating: rag_docs/\n",
+            "  inflating: rag_docs/attention_paper.pdf  \n",
+            "  inflating: rag_docs/cnn_paper.pdf  \n",
+            "  inflating: rag_docs/resnet_paper.pdf  \n",
+            "  inflating: rag_docs/vision_transformer.pdf  \n",
+            "  inflating: rag_docs/wikidata_rag_demo.jsonl  \n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_community.document_loaders import JSONLoader\n",
+        "\n",
+        "loader = JSONLoader(\n",
+        "    file_path='./rag_docs/wikidata_rag_demo.jsonl',\n",
+        "    jq_schema='.',\n",
+        "    text_content=False,\n",
+        "    json_lines=True\n",
+        ")\n",
+        "wiki_docs = loader.load()"
+      ],
+      "metadata": {
+        "id": "TXOzEGakB91m"
+      },
+      "execution_count": 15,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "len(wiki_docs)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "NWSnGHyWChwH",
+        "outputId": "66ce14b8-50f6-4d0e-91e9-b5cf374e096d"
+      },
+      "execution_count": 16,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1801"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "wiki_docs[1500]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "collapsed": true,
+        "id": "K6fXO3EzGVTR",
+        "outputId": "493af17a-e662-4184-9764-f947b4ecb9d7"
+      },
+      "execution_count": 17,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Document(metadata={'source': '/content/rag_docs/wikidata_rag_demo.jsonl', 'seq_num': 1501}, page_content='{\"id\": \"460169\", \"title\": \"Janne Persson\", \"paragraphs\": [\"Jan Persson (\\\\\"Janne Lucas\\\\\"), born 3 October 1947 in Gothenburg\\'s Gamlestad Parish in Gothenburg, Sweden is a Swedish pianist and singer, scoring several chart successes in Sweden during the 1970s and 1980s. Janne Lucas participated at Melodifestivalen 1980 with the song \\\\\"V\\\\u00e4xeln hall\\\\u00e5\\\\\", winning the contest. The upcoming year he participated with the song \\\\\"Rocky Mountain\\\\\" ending up third.\", \"For many years, Janne Lucas also acted as pianist for \\\\\"Vi i femman\\\\\"\", \"Janne also accompanied the vocal group \\\\\"Noviserna\\\\\" for a while, where Anna-Lisa Cederquist participated.\"]}')"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 17
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import json\n",
+        "from langchain_core.documents import Document\n",
+        "\n",
+        "wiki_docs_processed = []\n",
+        "\n",
+        "for doc in wiki_docs:\n",
+        "    doc = json.loads(doc.page_content)\n",
+        "    metadata = {\n",
+        "        \"title\": doc['title'],\n",
+        "        \"id\": doc['id'],\n",
+        "        \"source\": \"Wikipedia\"\n",
+        "    }\n",
+        "    data = ' '.join(doc['paragraphs'])\n",
+        "    wiki_docs_processed.append(Document(page_content=data, metadata=metadata))"
+      ],
+      "metadata": {
+        "id": "f0AwpkbWGZCG"
+      },
+      "execution_count": 38,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [],
+      "metadata": {
+        "id": "ld4Du2m9LptS"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "wiki_docs_processed[1500]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "K-qmX9oBHK-K",
+        "outputId": "3e4a5576-6bc1-4be6-97ed-16c1f3496501"
+      },
+      "execution_count": 39,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Document(metadata={'title': 'Janne Persson', 'id': '460169', 'source': 'Wikipedia'}, page_content='Jan Persson (\"Janne Lucas\"), born 3 October 1947 in Gothenburg\\'s Gamlestad Parish in Gothenburg, Sweden is a Swedish pianist and singer, scoring several chart successes in Sweden during the 1970s and 1980s. Janne Lucas participated at Melodifestivalen 1980 with the song \"Växeln hallå\", winning the contest. The upcoming year he participated with the song \"Rocky Mountain\" ending up third. For many years, Janne Lucas also acted as pianist for \"Vi i femman\" Janne also accompanied the vocal group \"Noviserna\" for a while, where Anna-Lisa Cederquist participated.')"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 39
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_community.document_loaders import PyMuPDFLoader\n",
+        "\n",
+        "loader = PyMuPDFLoader('./rag_docs/attention_paper.pdf')\n",
+        "doc_pages = loader.load()"
+      ],
+      "metadata": {
+        "id": "wTpcEYdYHWxz"
+      },
+      "execution_count": 40,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install langchain-text-splitters"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "5jptYB7fL6C2",
+        "outputId": "586230d4-18e8-42ef-e43f-4373e2619615"
+      },
+      "execution_count": 43,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: langchain-text-splitters in /usr/local/lib/python3.12/dist-packages (1.1.1)\n",
+            "Requirement already satisfied: langchain-core<2.0.0,>=1.2.13 in /usr/local/lib/python3.12/dist-packages (from langchain-text-splitters) (1.2.13)\n",
+            "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (1.33)\n",
+            "Requirement already satisfied: langsmith<1.0.0,>=0.3.45 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (0.7.3)\n",
+            "Requirement already satisfied: packaging>=23.2.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (26.0)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.7.4 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (2.12.3)\n",
+            "Requirement already satisfied: pyyaml<7.0.0,>=5.3.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (6.0.3)\n",
+            "Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (9.1.4)\n",
+            "Requirement already satisfied: typing-extensions<5.0.0,>=4.7.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (4.15.0)\n",
+            "Requirement already satisfied: uuid-utils<1.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (0.14.0)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.12/dist-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (3.0.0)\n",
+            "Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (0.28.1)\n",
+            "Requirement already satisfied: orjson>=3.9.14 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (3.11.7)\n",
+            "Requirement already satisfied: requests-toolbelt>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (1.0.0)\n",
+            "Requirement already satisfied: requests>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (2.32.5)\n",
+            "Requirement already satisfied: xxhash>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (3.6.0)\n",
+            "Requirement already satisfied: zstandard>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (0.25.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (2.41.4)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (0.4.2)\n",
+            "Requirement already satisfied: anyio in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (4.12.1)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (2026.1.4)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (1.0.9)\n",
+            "Requirement already satisfied: idna in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (3.11)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (0.16.0)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (3.4.4)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.2.13->langchain-text-splitters) (2.5.0)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_text_splitters import RecursiveCharacterTextSplitter\n",
+        "\n",
+        "splitter = RecursiveCharacterTextSplitter(chunk_size=3500,\n",
+        "                                          chunk_overlap=0)\n",
+        "doc_chunks = splitter.split_documents(doc_pages)"
+      ],
+      "metadata": {
+        "id": "51jLcNtpH8cH"
+      },
+      "execution_count": 49,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "len(doc_chunks)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "rq4mojyAI2_q",
+        "outputId": "503c7c27-9ce4-408c-991c-4c8dfbc016af"
+      },
+      "execution_count": 50,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "16"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 50
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# the actual research paper\n",
+        "big_doc = '\\n'.join([doc.page_content for doc in doc_chunks])"
+      ],
+      "metadata": {
+        "id": "LKYUSggoMZxQ"
+      },
+      "execution_count": 51,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "len(big_doc.split(' '))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "HVvixrvQMb1z",
+        "outputId": "d4542df2-6b89-4bfd-a2ba-280c5a2dbb36"
+      },
+      "execution_count": 52,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "5050"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 52
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_openai import ChatOpenAI\n",
+        "\n",
+        "chatgpt = ChatOpenAI(model_name=\"gpt-4o-mini\", temperature=0, openai_api_key=OPENAI_KEY)"
+      ],
+      "metadata": {
+        "id": "BZoNg-97Md0C"
+      },
+      "execution_count": 55,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_core.prompts import ChatPromptTemplate\n",
+        "from langchain_core.output_parsers import StrOutputParser\n",
+        "\n",
+        "\n",
+        "def generate_chunk_context(document, chunk):\n",
+        "\n",
+        "    chunk_process_prompt = \"\"\"You are an AI assistant specializing in research paper analysis.\n",
+        "                            Your task is to provide brief, relevant context for a chunk of text\n",
+        "                            based on the following research paper.\n",
+        "\n",
+        "                            Here is the research paper:\n",
+        "                            <paper>\n",
+        "                            {paper}\n",
+        "                            </paper>\n",
+        "\n",
+        "                            Here is the chunk we want to situate within the whole document:\n",
+        "                            <chunk>\n",
+        "                            {chunk}\n",
+        "                            </chunk>\n",
+        "\n",
+        "                            Provide a concise context (3-4 sentences max) for this chunk,\n",
+        "                            considering the following guidelines:\n",
+        "\n",
+        "                            - Give a short succinct context to situate this chunk within the overall document\n",
+        "                            for the purposes of improving search retrieval of the chunk.\n",
+        "                            - Answer only with the succinct context and nothing else.\n",
+        "                            - Context should be mentioned like 'Focuses on ....'\n",
+        "                            do not mention 'this chunk or section focuses on...'\n",
+        "\n",
+        "                            Context:\n",
+        "                        \"\"\"\n",
+        "\n",
+        "    prompt_template = ChatPromptTemplate.from_template(chunk_process_prompt)\n",
+        "\n",
+        "    agentic_chunk_chain = (prompt_template\n",
+        "                                |\n",
+        "                            chatgpt\n",
+        "                                |\n",
+        "                            StrOutputParser())\n",
+        "\n",
+        "    context = agentic_chunk_chain.invoke({'paper': document, 'chunk': chunk})\n",
+        "\n",
+        "    return context"
+      ],
+      "metadata": {
+        "id": "aWa4_aRLMgKq"
+      },
+      "execution_count": 59,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(doc_chunks[5].page_content)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "FOJQ-hcrMxVJ",
+        "outputId": "99b60fee-3b98-4bf6-c759-cbe6cc07ef08"
+      },
+      "execution_count": 60,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "output values. These are concatenated and once again projected, resulting in the final values, as\n",
+            "depicted in Figure 2.\n",
+            "Multi-head attention allows the model to jointly attend to information from different representation\n",
+            "subspaces at different positions. With a single attention head, averaging inhibits this.\n",
+            "MultiHead(Q, K, V ) = Concat(head1, ..., headh)W O\n",
+            "where headi = Attention(QW Q\n",
+            "i , KW K\n",
+            "i , V W V\n",
+            "i )\n",
+            "Where the projections are parameter matrices W Q\n",
+            "i\n",
+            "∈Rdmodel×dk, W K\n",
+            "i\n",
+            "∈Rdmodel×dk, W V\n",
+            "i\n",
+            "∈Rdmodel×dv\n",
+            "and W O ∈Rhdv×dmodel.\n",
+            "In this work we employ h = 8 parallel attention layers, or heads. For each of these we use\n",
+            "dk = dv = dmodel/h = 64. Due to the reduced dimension of each head, the total computational cost\n",
+            "is similar to that of single-head attention with full dimensionality.\n",
+            "3.2.3\n",
+            "Applications of Attention in our Model\n",
+            "The Transformer uses multi-head attention in three different ways:\n",
+            "• In \"encoder-decoder attention\" layers, the queries come from the previous decoder layer,\n",
+            "and the memory keys and values come from the output of the encoder. This allows every\n",
+            "position in the decoder to attend over all positions in the input sequence. This mimics the\n",
+            "typical encoder-decoder attention mechanisms in sequence-to-sequence models such as\n",
+            "[38, 2, 9].\n",
+            "• The encoder contains self-attention layers. In a self-attention layer all of the keys, values\n",
+            "and queries come from the same place, in this case, the output of the previous layer in the\n",
+            "encoder. Each position in the encoder can attend to all positions in the previous layer of the\n",
+            "encoder.\n",
+            "• Similarly, self-attention layers in the decoder allow each position in the decoder to attend to\n",
+            "all positions in the decoder up to and including that position. We need to prevent leftward\n",
+            "information flow in the decoder to preserve the auto-regressive property. We implement this\n",
+            "inside of scaled dot-product attention by masking out (setting to −∞) all values in the input\n",
+            "of the softmax which correspond to illegal connections. See Figure 2.\n",
+            "3.3\n",
+            "Position-wise Feed-Forward Networks\n",
+            "In addition to attention sub-layers, each of the layers in our encoder and decoder contains a fully\n",
+            "connected feed-forward network, which is applied to each position separately and identically. This\n",
+            "consists of two linear transformations with a ReLU activation in between.\n",
+            "FFN(x) = max(0, xW1 + b1)W2 + b2\n",
+            "(2)\n",
+            "While the linear transformations are the same across different positions, they use different parameters\n",
+            "from layer to layer. Another way of describing this is as two convolutions with kernel size 1.\n",
+            "The dimensionality of input and output is dmodel = 512, and the inner-layer has dimensionality\n",
+            "dff = 2048.\n",
+            "3.4\n",
+            "Embeddings and Softmax\n",
+            "Similarly to other sequence transduction models, we use learned embeddings to convert the input\n",
+            "tokens and output tokens to vectors of dimension dmodel. We also use the usual learned linear transfor-\n",
+            "mation and softmax function to convert the decoder output to predicted next-token probabilities. In\n",
+            "our model, we share the same weight matrix between the two embedding layers and the pre-softmax\n",
+            "linear transformation, similar to [30]. In the embedding layers, we multiply those weights by √dmodel.\n",
+            "5\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "generate_chunk_context(big_doc, doc_chunks[5].page_content)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 70
+        },
+        "id": "lrNmx5Y6NDfZ",
+        "outputId": "09801880-8dc8-4c42-8c73-21cd00c68c5c"
+      },
+      "execution_count": 61,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "\"Focuses on the implementation of multi-head attention in the Transformer model, detailing how multiple attention heads operate in parallel to enhance the model's ability to capture diverse information from different representation subspaces. It also describes the structure of the attention mechanism and its integration with position-wise feed-forward networks, which are essential components of the overall architecture.\""
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 61
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_community.document_loaders import PyMuPDFLoader\n",
+        "from langchain_text_splitters import RecursiveCharacterTextSplitter\n",
+        "from langchain_core.documents import Document\n",
+        "\n",
+        "def create_contextual_chunks(file_path):\n",
+        "\n",
+        "    print('Loading pages:', file_path)\n",
+        "    loader = PyMuPDFLoader(file_path)\n",
+        "    doc_pages = loader.load()\n",
+        "\n",
+        "    print('Chunking pages:', file_path)\n",
+        "    splitter = RecursiveCharacterTextSplitter(chunk_size=3500,\n",
+        "                                              chunk_overlap=0)\n",
+        "    doc_chunks = splitter.split_documents(doc_pages)\n",
+        "\n",
+        "    print('Generating contextual chunks:', file_path)\n",
+        "    original_doc = '\\n'.join([doc.page_content for doc in doc_chunks])\n",
+        "    contextual_chunks = []\n",
+        "    for chunk in doc_chunks:\n",
+        "        context = generate_chunk_context(original_doc, chunk.page_content)\n",
+        "        contextual_chunks.append(Document(page_content=context+'\\n'+chunk.page_content,\n",
+        "                                          metadata=chunk.metadata))\n",
+        "    print('Finished processing:', file_path)\n",
+        "    print()\n",
+        "    return contextual_chunks"
+      ],
+      "metadata": {
+        "id": "yD-ar7Q5NIBm"
+      },
+      "execution_count": 65,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from glob import glob\n",
+        "\n",
+        "pdf_files = glob('./rag_docs/*.pdf')\n",
+        "pdf_files"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "WGJjoPsGNN1z",
+        "outputId": "b81dea9a-cedf-49d6-d5e2-fd0b989b2d36"
+      },
+      "execution_count": 66,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['./rag_docs/vision_transformer.pdf',\n",
+              " './rag_docs/cnn_paper.pdf',\n",
+              " './rag_docs/attention_paper.pdf',\n",
+              " './rag_docs/resnet_paper.pdf']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 66
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "paper_docs = []\n",
+        "for fp in pdf_files:\n",
+        "    paper_docs.extend(create_contextual_chunks(fp))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "oFq8YmvuNpnj",
+        "outputId": "8a23f58d-43ce-4fdc-9bd3-61f7d8a45b49"
+      },
+      "execution_count": 68,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Loading pages: ./rag_docs/vision_transformer.pdf\n",
+            "Chunking pages: ./rag_docs/vision_transformer.pdf\n",
+            "Generating contextual chunks: ./rag_docs/vision_transformer.pdf\n",
+            "Finished processing: ./rag_docs/vision_transformer.pdf\n",
+            "\n",
+            "Loading pages: ./rag_docs/cnn_paper.pdf\n",
+            "Chunking pages: ./rag_docs/cnn_paper.pdf\n",
+            "Generating contextual chunks: ./rag_docs/cnn_paper.pdf\n",
+            "Finished processing: ./rag_docs/cnn_paper.pdf\n",
+            "\n",
+            "Loading pages: ./rag_docs/attention_paper.pdf\n",
+            "Chunking pages: ./rag_docs/attention_paper.pdf\n",
+            "Generating contextual chunks: ./rag_docs/attention_paper.pdf\n",
+            "Finished processing: ./rag_docs/attention_paper.pdf\n",
+            "\n",
+            "Loading pages: ./rag_docs/resnet_paper.pdf\n",
+            "Chunking pages: ./rag_docs/resnet_paper.pdf\n",
+            "Generating contextual chunks: ./rag_docs/resnet_paper.pdf\n",
+            "Finished processing: ./rag_docs/resnet_paper.pdf\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "len(paper_docs)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "pP06SC9RNqy1",
+        "outputId": "5ae2d837-9beb-41bf-d8c9-a54edccf83ef"
+      },
+      "execution_count": 69,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "79"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 69
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "paper_docs[0]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "kdVwfYxzN1Ue",
+        "outputId": "21adee6d-8da8-4909-841a-14b376d0e99b"
+      },
+      "execution_count": 70,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Document(metadata={'producer': 'pdfTeX-1.40.21', 'creator': 'LaTeX with hyperref', 'creationdate': '2021-06-04T00:19:58+00:00', 'source': './rag_docs/vision_transformer.pdf', 'file_path': './rag_docs/vision_transformer.pdf', 'total_pages': 22, 'format': 'PDF 1.5', 'title': '', 'author': '', 'subject': '', 'keywords': '', 'moddate': '2021-06-04T00:19:58+00:00', 'trapped': '', 'modDate': 'D:20210604001958Z', 'creationDate': 'D:20210604001958Z', 'page': 0}, page_content='Focuses on the introduction of the Vision Transformer (ViT) model, which applies a standard Transformer architecture directly to image classification tasks by treating image patches as tokens. It highlights the limitations of convolutional neural networks (CNNs) in computer vision and presents evidence that a pure Transformer can achieve competitive performance on various image recognition benchmarks when pre-trained on large datasets.\\nPublished as a conference paper at ICLR 2021\\nAN IMAGE IS WORTH 16X16 WORDS:\\nTRANSFORMERS FOR IMAGE RECOGNITION AT SCALE\\nAlexey Dosovitskiy∗,†, Lucas Beyer∗, Alexander Kolesnikov∗, Dirk Weissenborn∗,\\nXiaohua Zhai∗, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer,\\nGeorg Heigold, Sylvain Gelly, Jakob Uszkoreit, Neil Houlsby∗,†\\n∗equal technical contribution, †equal advising\\nGoogle Research, Brain Team\\n{adosovitskiy, neilhoulsby}@google.com\\nABSTRACT\\nWhile the Transformer architecture has become the de-facto standard for natural\\nlanguage processing tasks, its applications to computer vision remain limited. In\\nvision, attention is either applied in conjunction with convolutional networks, or\\nused to replace certain components of convolutional networks while keeping their\\noverall structure in place. We show that this reliance on CNNs is not necessary\\nand a pure transformer applied directly to sequences of image patches can perform\\nvery well on image classiﬁcation tasks. When pre-trained on large amounts of\\ndata and transferred to multiple mid-sized or small image recognition benchmarks\\n(ImageNet, CIFAR-100, VTAB, etc.), Vision Transformer (ViT) attains excellent\\nresults compared to state-of-the-art convolutional networks while requiring sub-\\nstantially fewer computational resources to train.1\\n1\\nINTRODUCTION\\nSelf-attention-based architectures, in particular Transformers (Vaswani et al., 2017), have become\\nthe model of choice in natural language processing (NLP). The dominant approach is to pre-train on\\na large text corpus and then ﬁne-tune on a smaller task-speciﬁc dataset (Devlin et al., 2019). Thanks\\nto Transformers’ computational efﬁciency and scalability, it has become possible to train models of\\nunprecedented size, with over 100B parameters (Brown et al., 2020; Lepikhin et al., 2020). With the\\nmodels and datasets growing, there is still no sign of saturating performance.\\nIn computer vision, however, convolutional architectures remain dominant (LeCun et al., 1989;\\nKrizhevsky et al., 2012; He et al., 2016). Inspired by NLP successes, multiple works try combining\\nCNN-like architectures with self-attention (Wang et al., 2018; Carion et al., 2020), some replacing\\nthe convolutions entirely (Ramachandran et al., 2019; Wang et al., 2020a). The latter models, while\\ntheoretically efﬁcient, have not yet been scaled effectively on modern hardware accelerators due to\\nthe use of specialized attention patterns. Therefore, in large-scale image recognition, classic ResNet-\\nlike architectures are still state of the art (Mahajan et al., 2018; Xie et al., 2020; Kolesnikov et al.,\\n2020).\\nInspired by the Transformer scaling successes in NLP, we experiment with applying a standard\\nTransformer directly to images, with the fewest possible modiﬁcations. To do so, we split an image\\ninto patches and provide the sequence of linear embeddings of these patches as an input to a Trans-\\nformer. Image patches are treated the same way as tokens (words) in an NLP application. We train\\nthe model on image classiﬁcation in supervised fashion.\\nWhen trained on mid-sized datasets such as ImageNet without strong regularization, these mod-\\nels yield modest accuracies of a few percentage points below ResNets of comparable size. This\\nseemingly discouraging outcome may be expected: Transformers lack some of the inductive biases\\n1Fine-tuning\\ncode\\nand\\npre-trained\\nmodels\\nare\\navailable\\nat\\nhttps://github.com/\\ngoogle-research/vision_transformer\\n1\\narXiv:2010.11929v2  [cs.CV]  3 Jun 2021')"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 70
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "len(wiki_docs_processed)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "TcuY9qNkN2c6",
+        "outputId": "2f421957-4916-4ea4-d9e5-491452a8a6bd"
+      },
+      "execution_count": 71,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1801"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 71
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "total_docs = wiki_docs_processed + paper_docs\n",
+        "len(total_docs)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "U0povUmmN3hg",
+        "outputId": "2502cd75-d0d4-4457-c71f-567944e48a76"
+      },
+      "execution_count": 72,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1880"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 72
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_chroma import Chroma\n",
+        "\n",
+        "# create vector DB of docs and embeddings - takes < 30s on Colab\n",
+        "chroma_db = Chroma.from_documents(documents=total_docs,\n",
+        "                                  collection_name='my_db',\n",
+        "                                  embedding=openai_embed_model,\n",
+        "                                  # need to set the distance function to cosine else it uses euclidean by default\n",
+        "                                  # check https://docs.trychroma.com/guides#changing-the-distance-function\n",
+        "                                  collection_metadata={\"hnsw:space\": \"cosine\"},\n",
+        "                                  persist_directory=\"./my_db\")"
+      ],
+      "metadata": {
+        "id": "dXEm0P-bN45X"
+      },
+      "execution_count": 73,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# load from disk\n",
+        "chroma_db = Chroma(persist_directory=\"./my_db\",\n",
+        "                   collection_name='my_db',\n",
+        "                   embedding_function=openai_embed_model)"
+      ],
+      "metadata": {
+        "id": "XkRTNSKrQIaP"
+      },
+      "execution_count": 74,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "chroma_db"
+      ],
+      "metadata": {
+        "id": "vOhsshnMQTDr",
+        "outputId": "9d8b8069-5daa-4f99-a6b8-1c537a6626b8",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 75,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<langchain_chroma.vectorstores.Chroma at 0x79b96f63c1d0>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 75
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "bU2Ndu30QVVn"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "name": "Welcome to Colab",
+      "toc_visible": true,
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
