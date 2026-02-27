@@ -1,0 +1,1828 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNcdEsvb4puVZtWKgqMLDvf",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/rahul02500/Practicepython/blob/main/Multi-user%20Conversational%20RAG%20System\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "uhJRQT_EuuV7",
+        "outputId": "b7831f0f-cbe8-4246-f120-1e717dfae841"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: langchain==0.3.26 in /usr/local/lib/python3.12/dist-packages (0.3.26)\n",
+            "Requirement already satisfied: langchain-core<1.0.0,>=0.3.66 in /usr/local/lib/python3.12/dist-packages (from langchain==0.3.26) (0.3.83)\n",
+            "Requirement already satisfied: langchain-text-splitters<1.0.0,>=0.3.8 in /usr/local/lib/python3.12/dist-packages (from langchain==0.3.26) (0.3.11)\n",
+            "Requirement already satisfied: langsmith>=0.1.17 in /usr/local/lib/python3.12/dist-packages (from langchain==0.3.26) (0.7.6)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.7.4 in /usr/local/lib/python3.12/dist-packages (from langchain==0.3.26) (2.12.3)\n",
+            "Requirement already satisfied: SQLAlchemy<3,>=1.4 in /usr/local/lib/python3.12/dist-packages (from langchain==0.3.26) (2.0.47)\n",
+            "Requirement already satisfied: requests<3,>=2 in /usr/local/lib/python3.12/dist-packages (from langchain==0.3.26) (2.32.4)\n",
+            "Requirement already satisfied: PyYAML>=5.3 in /usr/local/lib/python3.12/dist-packages (from langchain==0.3.26) (6.0.3)\n",
+            "Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.66->langchain==0.3.26) (9.1.4)\n",
+            "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.66->langchain==0.3.26) (1.33)\n",
+            "Requirement already satisfied: typing-extensions<5.0.0,>=4.7.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.66->langchain==0.3.26) (4.15.0)\n",
+            "Requirement already satisfied: packaging<26.0.0,>=23.2.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.66->langchain==0.3.26) (25.0)\n",
+            "Requirement already satisfied: uuid-utils<1.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.66->langchain==0.3.26) (0.14.1)\n",
+            "Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith>=0.1.17->langchain==0.3.26) (0.28.1)\n",
+            "Requirement already satisfied: orjson>=3.9.14 in /usr/local/lib/python3.12/dist-packages (from langsmith>=0.1.17->langchain==0.3.26) (3.11.7)\n",
+            "Requirement already satisfied: requests-toolbelt>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith>=0.1.17->langchain==0.3.26) (1.0.0)\n",
+            "Requirement already satisfied: xxhash>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith>=0.1.17->langchain==0.3.26) (3.6.0)\n",
+            "Requirement already satisfied: zstandard>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith>=0.1.17->langchain==0.3.26) (0.25.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain==0.3.26) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain==0.3.26) (2.41.4)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain==0.3.26) (0.4.2)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2->langchain==0.3.26) (3.4.4)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2->langchain==0.3.26) (3.11)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2->langchain==0.3.26) (2.5.0)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2->langchain==0.3.26) (2026.1.4)\n",
+            "Requirement already satisfied: greenlet>=1 in /usr/local/lib/python3.12/dist-packages (from SQLAlchemy<3,>=1.4->langchain==0.3.26) (3.3.2)\n",
+            "Requirement already satisfied: anyio in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith>=0.1.17->langchain==0.3.26) (4.12.1)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith>=0.1.17->langchain==0.3.26) (1.0.9)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->langsmith>=0.1.17->langchain==0.3.26) (0.16.0)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.12/dist-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<1.0.0,>=0.3.66->langchain==0.3.26) (3.0.0)\n",
+            "Collecting langchain-openai==0.3.28\n",
+            "  Using cached langchain_openai-0.3.28-py3-none-any.whl.metadata (2.3 kB)\n",
+            "Requirement already satisfied: langchain-core<1.0.0,>=0.3.68 in /usr/local/lib/python3.12/dist-packages (from langchain-openai==0.3.28) (0.3.83)\n",
+            "Collecting openai<2.0.0,>=1.86.0 (from langchain-openai==0.3.28)\n",
+            "  Using cached openai-1.109.1-py3-none-any.whl.metadata (29 kB)\n",
+            "Requirement already satisfied: tiktoken<1,>=0.7 in /usr/local/lib/python3.12/dist-packages (from langchain-openai==0.3.28) (0.12.0)\n",
+            "Requirement already satisfied: langsmith<1.0.0,>=0.3.45 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (0.7.6)\n",
+            "Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (9.1.4)\n",
+            "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (1.33)\n",
+            "Requirement already satisfied: PyYAML<7.0.0,>=5.3.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (6.0.3)\n",
+            "Requirement already satisfied: typing-extensions<5.0.0,>=4.7.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (4.15.0)\n",
+            "Requirement already satisfied: packaging<26.0.0,>=23.2.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (25.0)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.7.4 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (2.12.3)\n",
+            "Requirement already satisfied: uuid-utils<1.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (0.14.1)\n",
+            "Requirement already satisfied: anyio<5,>=3.5.0 in /usr/local/lib/python3.12/dist-packages (from openai<2.0.0,>=1.86.0->langchain-openai==0.3.28) (4.12.1)\n",
+            "Requirement already satisfied: distro<2,>=1.7.0 in /usr/local/lib/python3.12/dist-packages (from openai<2.0.0,>=1.86.0->langchain-openai==0.3.28) (1.9.0)\n",
+            "Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from openai<2.0.0,>=1.86.0->langchain-openai==0.3.28) (0.28.1)\n",
+            "Requirement already satisfied: jiter<1,>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from openai<2.0.0,>=1.86.0->langchain-openai==0.3.28) (0.13.0)\n",
+            "Requirement already satisfied: sniffio in /usr/local/lib/python3.12/dist-packages (from openai<2.0.0,>=1.86.0->langchain-openai==0.3.28) (1.3.1)\n",
+            "Requirement already satisfied: tqdm>4 in /usr/local/lib/python3.12/dist-packages (from openai<2.0.0,>=1.86.0->langchain-openai==0.3.28) (4.67.3)\n",
+            "Requirement already satisfied: regex>=2022.1.18 in /usr/local/lib/python3.12/dist-packages (from tiktoken<1,>=0.7->langchain-openai==0.3.28) (2025.11.3)\n",
+            "Requirement already satisfied: requests>=2.26.0 in /usr/local/lib/python3.12/dist-packages (from tiktoken<1,>=0.7->langchain-openai==0.3.28) (2.32.4)\n",
+            "Requirement already satisfied: idna>=2.8 in /usr/local/lib/python3.12/dist-packages (from anyio<5,>=3.5.0->openai<2.0.0,>=1.86.0->langchain-openai==0.3.28) (3.11)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->openai<2.0.0,>=1.86.0->langchain-openai==0.3.28) (2026.1.4)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->openai<2.0.0,>=1.86.0->langchain-openai==0.3.28) (1.0.9)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->openai<2.0.0,>=1.86.0->langchain-openai==0.3.28) (0.16.0)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.12/dist-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (3.0.0)\n",
+            "Requirement already satisfied: orjson>=3.9.14 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (3.11.7)\n",
+            "Requirement already satisfied: requests-toolbelt>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (1.0.0)\n",
+            "Requirement already satisfied: xxhash>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (3.6.0)\n",
+            "Requirement already satisfied: zstandard>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (0.25.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (2.41.4)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<1.0.0,>=0.3.68->langchain-openai==0.3.28) (0.4.2)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests>=2.26.0->tiktoken<1,>=0.7->langchain-openai==0.3.28) (3.4.4)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests>=2.26.0->tiktoken<1,>=0.7->langchain-openai==0.3.28) (2.5.0)\n",
+            "Using cached langchain_openai-0.3.28-py3-none-any.whl (70 kB)\n",
+            "Using cached openai-1.109.1-py3-none-any.whl (948 kB)\n",
+            "Installing collected packages: openai, langchain-openai\n",
+            "  Attempting uninstall: openai\n",
+            "    Found existing installation: openai 2.23.0\n",
+            "    Uninstalling openai-2.23.0:\n",
+            "      Successfully uninstalled openai-2.23.0\n",
+            "Successfully installed langchain-openai-0.3.28 openai-1.109.1\n",
+            "Collecting langchain-community==0.3.27\n",
+            "  Using cached langchain_community-0.3.27-py3-none-any.whl.metadata (2.9 kB)\n",
+            "Requirement already satisfied: langchain-core<1.0.0,>=0.3.66 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (0.3.83)\n",
+            "Requirement already satisfied: langchain<1.0.0,>=0.3.26 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (0.3.26)\n",
+            "Requirement already satisfied: SQLAlchemy<3,>=1.4 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (2.0.47)\n",
+            "Requirement already satisfied: requests<3,>=2 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (2.32.4)\n",
+            "Requirement already satisfied: PyYAML>=5.3 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (6.0.3)\n",
+            "Requirement already satisfied: aiohttp<4.0.0,>=3.8.3 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (3.13.3)\n",
+            "Requirement already satisfied: tenacity!=8.4.0,<10,>=8.1.0 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (9.1.4)\n",
+            "Collecting dataclasses-json<0.7,>=0.5.7 (from langchain-community==0.3.27)\n",
+            "  Using cached dataclasses_json-0.6.7-py3-none-any.whl.metadata (25 kB)\n",
+            "Requirement already satisfied: pydantic-settings<3.0.0,>=2.4.0 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (2.13.1)\n",
+            "Requirement already satisfied: langsmith>=0.1.125 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (0.7.6)\n",
+            "Requirement already satisfied: httpx-sse<1.0.0,>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (0.4.3)\n",
+            "Requirement already satisfied: numpy>=1.26.2 in /usr/local/lib/python3.12/dist-packages (from langchain-community==0.3.27) (2.0.2)\n",
+            "Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community==0.3.27) (2.6.1)\n",
+            "Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community==0.3.27) (1.4.0)\n",
+            "Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community==0.3.27) (25.4.0)\n",
+            "Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community==0.3.27) (1.8.0)\n",
+            "Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community==0.3.27) (6.7.1)\n",
+            "Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community==0.3.27) (0.4.1)\n",
+            "Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community==0.3.27) (1.22.0)\n",
+            "Collecting marshmallow<4.0.0,>=3.18.0 (from dataclasses-json<0.7,>=0.5.7->langchain-community==0.3.27)\n",
+            "  Using cached marshmallow-3.26.2-py3-none-any.whl.metadata (7.3 kB)\n",
+            "Collecting typing-inspect<1,>=0.4.0 (from dataclasses-json<0.7,>=0.5.7->langchain-community==0.3.27)\n",
+            "  Using cached typing_inspect-0.9.0-py3-none-any.whl.metadata (1.5 kB)\n",
+            "Requirement already satisfied: langchain-text-splitters<1.0.0,>=0.3.8 in /usr/local/lib/python3.12/dist-packages (from langchain<1.0.0,>=0.3.26->langchain-community==0.3.27) (0.3.11)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.7.4 in /usr/local/lib/python3.12/dist-packages (from langchain<1.0.0,>=0.3.26->langchain-community==0.3.27) (2.12.3)\n",
+            "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.66->langchain-community==0.3.27) (1.33)\n",
+            "Requirement already satisfied: typing-extensions<5.0.0,>=4.7.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.66->langchain-community==0.3.27) (4.15.0)\n",
+            "Requirement already satisfied: packaging<26.0.0,>=23.2.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.66->langchain-community==0.3.27) (25.0)\n",
+            "Requirement already satisfied: uuid-utils<1.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core<1.0.0,>=0.3.66->langchain-community==0.3.27) (0.14.1)\n",
+            "Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith>=0.1.125->langchain-community==0.3.27) (0.28.1)\n",
+            "Requirement already satisfied: orjson>=3.9.14 in /usr/local/lib/python3.12/dist-packages (from langsmith>=0.1.125->langchain-community==0.3.27) (3.11.7)\n",
+            "Requirement already satisfied: requests-toolbelt>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith>=0.1.125->langchain-community==0.3.27) (1.0.0)\n",
+            "Requirement already satisfied: xxhash>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith>=0.1.125->langchain-community==0.3.27) (3.6.0)\n",
+            "Requirement already satisfied: zstandard>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith>=0.1.125->langchain-community==0.3.27) (0.25.0)\n",
+            "Requirement already satisfied: python-dotenv>=0.21.0 in /usr/local/lib/python3.12/dist-packages (from pydantic-settings<3.0.0,>=2.4.0->langchain-community==0.3.27) (1.2.1)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from pydantic-settings<3.0.0,>=2.4.0->langchain-community==0.3.27) (0.4.2)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2->langchain-community==0.3.27) (3.4.4)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2->langchain-community==0.3.27) (3.11)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2->langchain-community==0.3.27) (2.5.0)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2->langchain-community==0.3.27) (2026.1.4)\n",
+            "Requirement already satisfied: greenlet>=1 in /usr/local/lib/python3.12/dist-packages (from SQLAlchemy<3,>=1.4->langchain-community==0.3.27) (3.3.2)\n",
+            "Requirement already satisfied: anyio in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith>=0.1.125->langchain-community==0.3.27) (4.12.1)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->langsmith>=0.1.125->langchain-community==0.3.27) (1.0.9)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->langsmith>=0.1.125->langchain-community==0.3.27) (0.16.0)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.12/dist-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<1.0.0,>=0.3.66->langchain-community==0.3.27) (3.0.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain<1.0.0,>=0.3.26->langchain-community==0.3.27) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.7.4->langchain<1.0.0,>=0.3.26->langchain-community==0.3.27) (2.41.4)\n",
+            "Collecting mypy-extensions>=0.3.0 (from typing-inspect<1,>=0.4.0->dataclasses-json<0.7,>=0.5.7->langchain-community==0.3.27)\n",
+            "  Downloading mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)\n",
+            "Downloading langchain_community-0.3.27-py3-none-any.whl (2.5 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m2.5/2.5 MB\u001b[0m \u001b[31m8.7 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading dataclasses_json-0.6.7-py3-none-any.whl (28 kB)\n",
+            "Downloading marshmallow-3.26.2-py3-none-any.whl (50 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m51.0/51.0 kB\u001b[0m \u001b[31m5.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading typing_inspect-0.9.0-py3-none-any.whl (8.8 kB)\n",
+            "Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)\n",
+            "Installing collected packages: mypy-extensions, marshmallow, typing-inspect, dataclasses-json, langchain-community\n",
+            "Successfully installed dataclasses-json-0.6.7 langchain-community-0.3.27 marshmallow-3.26.2 mypy-extensions-1.1.0 typing-inspect-0.9.0\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install langchain==0.3.26\n",
+        "!pip install langchain-openai==0.3.28\n",
+        "!pip install langchain-community==0.3.27"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install langchain-chroma==0.2.4"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Dxwb3J2pu6g2",
+        "outputId": "0bd3820a-65e7-4132-f637-59c81c1c1b57"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting langchain-chroma==0.2.4\n",
+            "  Downloading langchain_chroma-0.2.4-py3-none-any.whl.metadata (1.1 kB)\n",
+            "Requirement already satisfied: langchain-core>=0.3.60 in /usr/local/lib/python3.12/dist-packages (from langchain-chroma==0.2.4) (0.3.83)\n",
+            "Requirement already satisfied: numpy>=1.26.0 in /usr/local/lib/python3.12/dist-packages (from langchain-chroma==0.2.4) (2.0.2)\n",
+            "Collecting chromadb>=1.0.9 (from langchain-chroma==0.2.4)\n",
+            "  Downloading chromadb-1.5.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.2 kB)\n",
+            "Collecting build>=1.0.3 (from chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading build-1.4.0-py3-none-any.whl.metadata (5.8 kB)\n",
+            "Requirement already satisfied: pydantic>=1.9 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (2.12.3)\n",
+            "Collecting pybase64>=1.4.1 (from chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading pybase64-1.4.3-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl.metadata (8.7 kB)\n",
+            "Requirement already satisfied: uvicorn>=0.18.3 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.41.0)\n",
+            "Collecting posthog<6.0.0,>=2.4.0 (from chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading posthog-5.4.0-py3-none-any.whl.metadata (5.7 kB)\n",
+            "Requirement already satisfied: typing-extensions>=4.5.0 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (4.15.0)\n",
+            "Collecting onnxruntime>=1.14.1 (from chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading onnxruntime-1.24.2-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (5.0 kB)\n",
+            "Requirement already satisfied: opentelemetry-api>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (1.38.0)\n",
+            "Collecting opentelemetry-exporter-otlp-proto-grpc>=1.2.0 (from chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading opentelemetry_exporter_otlp_proto_grpc-1.39.1-py3-none-any.whl.metadata (2.5 kB)\n",
+            "Requirement already satisfied: opentelemetry-sdk>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (1.38.0)\n",
+            "Requirement already satisfied: tokenizers>=0.13.2 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (0.22.2)\n",
+            "Collecting pypika>=0.48.9 (from chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading pypika-0.51.1-py2.py3-none-any.whl.metadata (51 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m52.0/52.0 kB\u001b[0m \u001b[31m2.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: tqdm>=4.65.0 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (4.67.3)\n",
+            "Requirement already satisfied: overrides>=7.3.1 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (7.7.0)\n",
+            "Requirement already satisfied: importlib-resources in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (6.5.2)\n",
+            "Requirement already satisfied: grpcio>=1.58.0 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (1.78.1)\n",
+            "Collecting bcrypt>=4.0.1 (from chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading bcrypt-5.0.0-cp39-abi3-manylinux_2_34_x86_64.whl.metadata (10 kB)\n",
+            "Requirement already satisfied: typer>=0.9.0 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (0.24.1)\n",
+            "Collecting kubernetes>=28.1.0 (from chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading kubernetes-35.0.0-py2.py3-none-any.whl.metadata (1.7 kB)\n",
+            "Requirement already satisfied: tenacity>=8.2.3 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (9.1.4)\n",
+            "Requirement already satisfied: pyyaml>=6.0.0 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (6.0.3)\n",
+            "Requirement already satisfied: mmh3>=4.0.1 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (5.2.0)\n",
+            "Requirement already satisfied: orjson>=3.9.12 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (3.11.7)\n",
+            "Requirement already satisfied: httpx>=0.27.0 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (0.28.1)\n",
+            "Requirement already satisfied: rich>=10.11.0 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (13.9.4)\n",
+            "Requirement already satisfied: jsonschema>=4.19.0 in /usr/local/lib/python3.12/dist-packages (from chromadb>=1.0.9->langchain-chroma==0.2.4) (4.26.0)\n",
+            "Requirement already satisfied: langsmith<1.0.0,>=0.3.45 in /usr/local/lib/python3.12/dist-packages (from langchain-core>=0.3.60->langchain-chroma==0.2.4) (0.7.6)\n",
+            "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core>=0.3.60->langchain-chroma==0.2.4) (1.33)\n",
+            "Requirement already satisfied: packaging<26.0.0,>=23.2.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core>=0.3.60->langchain-chroma==0.2.4) (25.0)\n",
+            "Requirement already satisfied: uuid-utils<1.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from langchain-core>=0.3.60->langchain-chroma==0.2.4) (0.14.1)\n",
+            "Collecting pyproject_hooks (from build>=1.0.3->chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading pyproject_hooks-1.2.0-py3-none-any.whl.metadata (1.3 kB)\n",
+            "Requirement already satisfied: anyio in /usr/local/lib/python3.12/dist-packages (from httpx>=0.27.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (4.12.1)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx>=0.27.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (2026.1.4)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx>=0.27.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.0.9)\n",
+            "Requirement already satisfied: idna in /usr/local/lib/python3.12/dist-packages (from httpx>=0.27.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (3.11)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx>=0.27.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.16.0)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.12/dist-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core>=0.3.60->langchain-chroma==0.2.4) (3.0.0)\n",
+            "Requirement already satisfied: attrs>=22.2.0 in /usr/local/lib/python3.12/dist-packages (from jsonschema>=4.19.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (25.4.0)\n",
+            "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /usr/local/lib/python3.12/dist-packages (from jsonschema>=4.19.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (2025.9.1)\n",
+            "Requirement already satisfied: referencing>=0.28.4 in /usr/local/lib/python3.12/dist-packages (from jsonschema>=4.19.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.37.0)\n",
+            "Requirement already satisfied: rpds-py>=0.25.0 in /usr/local/lib/python3.12/dist-packages (from jsonschema>=4.19.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.30.0)\n",
+            "Requirement already satisfied: six>=1.9.0 in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.17.0)\n",
+            "Requirement already satisfied: python-dateutil>=2.5.3 in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (2.9.0.post0)\n",
+            "Requirement already satisfied: websocket-client!=0.40.0,!=0.41.*,!=0.42.*,>=0.32.0 in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.9.0)\n",
+            "Requirement already satisfied: requests in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (2.32.4)\n",
+            "Requirement already satisfied: requests-oauthlib in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (2.0.0)\n",
+            "Requirement already satisfied: urllib3!=2.6.0,>=1.24.2 in /usr/local/lib/python3.12/dist-packages (from kubernetes>=28.1.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (2.5.0)\n",
+            "Collecting durationpy>=0.7 (from kubernetes>=28.1.0->chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading durationpy-0.10-py3-none-any.whl.metadata (340 bytes)\n",
+            "Requirement already satisfied: requests-toolbelt>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core>=0.3.60->langchain-chroma==0.2.4) (1.0.0)\n",
+            "Requirement already satisfied: xxhash>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core>=0.3.60->langchain-chroma==0.2.4) (3.6.0)\n",
+            "Requirement already satisfied: zstandard>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from langsmith<1.0.0,>=0.3.45->langchain-core>=0.3.60->langchain-chroma==0.2.4) (0.25.0)\n",
+            "Requirement already satisfied: flatbuffers in /usr/local/lib/python3.12/dist-packages (from onnxruntime>=1.14.1->chromadb>=1.0.9->langchain-chroma==0.2.4) (25.12.19)\n",
+            "Requirement already satisfied: protobuf in /usr/local/lib/python3.12/dist-packages (from onnxruntime>=1.14.1->chromadb>=1.0.9->langchain-chroma==0.2.4) (5.29.6)\n",
+            "Requirement already satisfied: sympy in /usr/local/lib/python3.12/dist-packages (from onnxruntime>=1.14.1->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.14.0)\n",
+            "Requirement already satisfied: importlib-metadata<8.8.0,>=6.0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-api>=1.2.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (8.7.1)\n",
+            "Requirement already satisfied: googleapis-common-protos~=1.57 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.72.0)\n",
+            "Collecting opentelemetry-exporter-otlp-proto-common==1.39.1 (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading opentelemetry_exporter_otlp_proto_common-1.39.1-py3-none-any.whl.metadata (1.8 kB)\n",
+            "Collecting opentelemetry-proto==1.39.1 (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading opentelemetry_proto-1.39.1-py3-none-any.whl.metadata (2.3 kB)\n",
+            "Collecting opentelemetry-sdk>=1.2.0 (from chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading opentelemetry_sdk-1.39.1-py3-none-any.whl.metadata (1.5 kB)\n",
+            "Collecting opentelemetry-api>=1.2.0 (from chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading opentelemetry_api-1.39.1-py3-none-any.whl.metadata (1.5 kB)\n",
+            "Collecting opentelemetry-semantic-conventions==0.60b1 (from opentelemetry-sdk>=1.2.0->chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading opentelemetry_semantic_conventions-0.60b1-py3-none-any.whl.metadata (2.4 kB)\n",
+            "Collecting backoff>=1.10.0 (from posthog<6.0.0,>=2.4.0->chromadb>=1.0.9->langchain-chroma==0.2.4)\n",
+            "  Downloading backoff-2.2.1-py3-none-any.whl.metadata (14 kB)\n",
+            "Requirement already satisfied: distro>=1.5.0 in /usr/local/lib/python3.12/dist-packages (from posthog<6.0.0,>=2.4.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.9.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic>=1.9->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic>=1.9->chromadb>=1.0.9->langchain-chroma==0.2.4) (2.41.4)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic>=1.9->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.4.2)\n",
+            "Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from rich>=10.11.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (4.0.0)\n",
+            "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.12/dist-packages (from rich>=10.11.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (2.19.2)\n",
+            "Requirement already satisfied: huggingface-hub<2.0,>=0.16.4 in /usr/local/lib/python3.12/dist-packages (from tokenizers>=0.13.2->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.4.1)\n",
+            "Requirement already satisfied: click>=8.2.1 in /usr/local/lib/python3.12/dist-packages (from typer>=0.9.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (8.3.1)\n",
+            "Requirement already satisfied: shellingham>=1.3.0 in /usr/local/lib/python3.12/dist-packages (from typer>=0.9.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.5.4)\n",
+            "Requirement already satisfied: annotated-doc>=0.0.2 in /usr/local/lib/python3.12/dist-packages (from typer>=0.9.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.0.4)\n",
+            "Requirement already satisfied: httptools>=0.6.3 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.7.1)\n",
+            "Requirement already satisfied: python-dotenv>=0.13 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.2.1)\n",
+            "Requirement already satisfied: uvloop>=0.15.1 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.22.1)\n",
+            "Requirement already satisfied: watchfiles>=0.20 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.1.1)\n",
+            "Requirement already satisfied: websockets>=10.4 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.18.3->chromadb>=1.0.9->langchain-chroma==0.2.4) (15.0.1)\n",
+            "Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb>=1.0.9->langchain-chroma==0.2.4) (3.24.3)\n",
+            "Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb>=1.0.9->langchain-chroma==0.2.4) (2025.3.0)\n",
+            "Requirement already satisfied: hf-xet<2.0.0,>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.3.0)\n",
+            "Requirement already satisfied: typer-slim in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.24.0)\n",
+            "Requirement already satisfied: zipp>=3.20 in /usr/local/lib/python3.12/dist-packages (from importlib-metadata<8.8.0,>=6.0->opentelemetry-api>=1.2.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (3.23.0)\n",
+            "Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.12/dist-packages (from markdown-it-py>=2.2.0->rich>=10.11.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (0.1.2)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests->kubernetes>=28.1.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (3.4.4)\n",
+            "Requirement already satisfied: oauthlib>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from requests-oauthlib->kubernetes>=28.1.0->chromadb>=1.0.9->langchain-chroma==0.2.4) (3.3.1)\n",
+            "Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy->onnxruntime>=1.14.1->chromadb>=1.0.9->langchain-chroma==0.2.4) (1.3.0)\n",
+            "Downloading langchain_chroma-0.2.4-py3-none-any.whl (11 kB)\n",
+            "Downloading chromadb-1.5.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (21.5 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m21.5/21.5 MB\u001b[0m \u001b[31m97.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading bcrypt-5.0.0-cp39-abi3-manylinux_2_34_x86_64.whl (278 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m278.2/278.2 kB\u001b[0m \u001b[31m25.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading build-1.4.0-py3-none-any.whl (24 kB)\n",
+            "Downloading kubernetes-35.0.0-py2.py3-none-any.whl (2.0 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m2.0/2.0 MB\u001b[0m \u001b[31m112.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading onnxruntime-1.24.2-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (17.1 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m17.1/17.1 MB\u001b[0m \u001b[31m50.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading opentelemetry_exporter_otlp_proto_grpc-1.39.1-py3-none-any.whl (19 kB)\n",
+            "Downloading opentelemetry_exporter_otlp_proto_common-1.39.1-py3-none-any.whl (18 kB)\n",
+            "Downloading opentelemetry_proto-1.39.1-py3-none-any.whl (72 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m72.5/72.5 kB\u001b[0m \u001b[31m8.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading opentelemetry_sdk-1.39.1-py3-none-any.whl (132 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m132.6/132.6 kB\u001b[0m \u001b[31m13.7 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading opentelemetry_api-1.39.1-py3-none-any.whl (66 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m66.4/66.4 kB\u001b[0m \u001b[31m6.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading opentelemetry_semantic_conventions-0.60b1-py3-none-any.whl (219 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m220.0/220.0 kB\u001b[0m \u001b[31m21.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading posthog-5.4.0-py3-none-any.whl (105 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m105.4/105.4 kB\u001b[0m \u001b[31m10.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading pybase64-1.4.3-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl (71 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m71.6/71.6 kB\u001b[0m \u001b[31m6.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading pypika-0.51.1-py2.py3-none-any.whl (60 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m60.6/60.6 kB\u001b[0m \u001b[31m4.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading backoff-2.2.1-py3-none-any.whl (15 kB)\n",
+            "Downloading durationpy-0.10-py3-none-any.whl (3.9 kB)\n",
+            "Downloading pyproject_hooks-1.2.0-py3-none-any.whl (10 kB)\n",
+            "Installing collected packages: pypika, durationpy, pyproject_hooks, pybase64, opentelemetry-proto, bcrypt, backoff, posthog, opentelemetry-exporter-otlp-proto-common, opentelemetry-api, onnxruntime, build, opentelemetry-semantic-conventions, kubernetes, opentelemetry-sdk, opentelemetry-exporter-otlp-proto-grpc, chromadb, langchain-chroma\n",
+            "  Attempting uninstall: opentelemetry-proto\n",
+            "    Found existing installation: opentelemetry-proto 1.38.0\n",
+            "    Uninstalling opentelemetry-proto-1.38.0:\n",
+            "      Successfully uninstalled opentelemetry-proto-1.38.0\n",
+            "  Attempting uninstall: opentelemetry-exporter-otlp-proto-common\n",
+            "    Found existing installation: opentelemetry-exporter-otlp-proto-common 1.38.0\n",
+            "    Uninstalling opentelemetry-exporter-otlp-proto-common-1.38.0:\n",
+            "      Successfully uninstalled opentelemetry-exporter-otlp-proto-common-1.38.0\n",
+            "  Attempting uninstall: opentelemetry-api\n",
+            "    Found existing installation: opentelemetry-api 1.38.0\n",
+            "    Uninstalling opentelemetry-api-1.38.0:\n",
+            "      Successfully uninstalled opentelemetry-api-1.38.0\n",
+            "  Attempting uninstall: opentelemetry-semantic-conventions\n",
+            "    Found existing installation: opentelemetry-semantic-conventions 0.59b0\n",
+            "    Uninstalling opentelemetry-semantic-conventions-0.59b0:\n",
+            "      Successfully uninstalled opentelemetry-semantic-conventions-0.59b0\n",
+            "  Attempting uninstall: opentelemetry-sdk\n",
+            "    Found existing installation: opentelemetry-sdk 1.38.0\n",
+            "    Uninstalling opentelemetry-sdk-1.38.0:\n",
+            "      Successfully uninstalled opentelemetry-sdk-1.38.0\n",
+            "\u001b[31mERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n",
+            "opentelemetry-exporter-gcp-logging 1.11.0a0 requires opentelemetry-sdk<1.39.0,>=1.35.0, but you have opentelemetry-sdk 1.39.1 which is incompatible.\n",
+            "opentelemetry-exporter-otlp-proto-http 1.38.0 requires opentelemetry-exporter-otlp-proto-common==1.38.0, but you have opentelemetry-exporter-otlp-proto-common 1.39.1 which is incompatible.\n",
+            "opentelemetry-exporter-otlp-proto-http 1.38.0 requires opentelemetry-proto==1.38.0, but you have opentelemetry-proto 1.39.1 which is incompatible.\n",
+            "opentelemetry-exporter-otlp-proto-http 1.38.0 requires opentelemetry-sdk~=1.38.0, but you have opentelemetry-sdk 1.39.1 which is incompatible.\u001b[0m\u001b[31m\n",
+            "\u001b[0mSuccessfully installed backoff-2.2.1 bcrypt-5.0.0 build-1.4.0 chromadb-1.5.2 durationpy-0.10 kubernetes-35.0.0 langchain-chroma-0.2.4 onnxruntime-1.24.2 opentelemetry-api-1.39.1 opentelemetry-exporter-otlp-proto-common-1.39.1 opentelemetry-exporter-otlp-proto-grpc-1.39.1 opentelemetry-proto-1.39.1 opentelemetry-sdk-1.39.1 opentelemetry-semantic-conventions-0.60b1 posthog-5.4.0 pybase64-1.4.3 pypika-0.51.1 pyproject_hooks-1.2.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from getpass import getpass\n",
+        "\n",
+        "OPENAI_KEY = getpass('Enter your OpenAI Key: ')\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "dr-tXOMdwoRU",
+        "outputId": "fda31c3b-6bb6-4b13-ef11-9d55b6a4aa0b"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Enter your OpenAI Key: ··········\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import os\n",
+        "\n",
+        "os.environ['OPENAI_API_KEY'] = OPENAI_KEY"
+      ],
+      "metadata": {
+        "id": "s0nlwfTlws8F"
+      },
+      "execution_count": 4,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import gzip\n",
+        "import json\n",
+        "import requests\n",
+        "from tqdm import tqdm\n",
+        "import sys\n",
+        "import os\n",
+        "\n",
+        "# Download a file from a URL\n",
+        "def http_get(url, path) -> None:\n",
+        "    \"\"\"\n",
+        "    Downloads a URL to a given path on disc\n",
+        "    \"\"\"\n",
+        "    if os.path.dirname(path) != \"\":\n",
+        "        os.makedirs(os.path.dirname(path), exist_ok=True)\n",
+        "\n",
+        "    req = requests.get(url, stream=True)\n",
+        "    if req.status_code != 200:\n",
+        "        print(\"Exception when trying to download {}. Response {}\".format(url, req.status_code), file=sys.stderr)\n",
+        "        req.raise_for_status()\n",
+        "        return\n",
+        "\n",
+        "    download_filepath = path + \"_part\"\n",
+        "    with open(download_filepath, \"wb\") as file_binary:\n",
+        "        content_length = req.headers.get(\"Content-Length\")\n",
+        "        total = int(content_length) if content_length is not None else None\n",
+        "        progress = tqdm(unit=\"B\", total=total, unit_scale=True)\n",
+        "        for chunk in req.iter_content(chunk_size=1024):\n",
+        "            if chunk:  # filter out keep-alive new chunks\n",
+        "                progress.update(len(chunk))\n",
+        "                file_binary.write(chunk)\n",
+        "\n",
+        "    os.rename(download_filepath, path)\n",
+        "    progress.close()\n",
+        "\n",
+        "\n",
+        "wikipedia_filepath = 'simplewiki-2020-11-01.jsonl.gz'\n",
+        "\n",
+        "http_get('http://sbert.net/datasets/simplewiki-2020-11-01.jsonl.gz', wikipedia_filepath)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "gq9y3EfMwzO_",
+        "outputId": "e4b40767-76ee-4422-f298-cee563a83e79"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "100%|██████████| 50.2M/50.2M [00:06<00:00, 7.33MB/s]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import gzip\n",
+        "import json\n",
+        "\n",
+        "wikipedia_filepath = 'simplewiki-2020-11-01.jsonl.gz'\n",
+        "\n",
+        "passages = []\n",
+        "with gzip.open(wikipedia_filepath, 'rt', encoding='utf8') as fIn:\n",
+        "    for line in fIn:\n",
+        "        data = json.loads(line.strip())\n",
+        "        #Only add the first paragraph\n",
+        "        passages.append(data['paragraphs'][0])\n",
+        "\n",
+        "print(\"Passages:\", len(passages))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Z0K2G5j8w3wm",
+        "outputId": "92e15f53-e8c0-4cb6-814c-c6f595348cad"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Passages: 169597\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# We subset our data so we only use a subset of wikipedia to run things faster\n",
+        "passages = [passage for passage in passages for x in ['fish', 'india', 'cheetah']\n",
+        "              if x in passage.lower().split()]"
+      ],
+      "metadata": {
+        "id": "eRfDOYxzxBhJ"
+      },
+      "execution_count": 7,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "len(passages)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "gz_7bcbNxNU7",
+        "outputId": "87a13d4f-bf1d-468f-fd68-57087ed30f22"
+      },
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1070"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 8
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "passages[0]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 70
+        },
+        "id": "rJDpmMX_xOyl",
+        "outputId": "d64469b8-7a09-40a4-9de0-83e0277b57d7"
+      },
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "\"An electric fish is a fish that can make electric fields. Many fish (sharks, rays, and catfish) can detect electric fields: they are 'electroreceptive'. They cannot make electric fields, and are not called electric fish.\""
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 9
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_openai import ChatOpenAI\n",
+        "\n",
+        "chatgpt = ChatOpenAI(model_name=\"gpt-4o-mini\", temperature=0)"
+      ],
+      "metadata": {
+        "id": "M1vt9ADixPvR"
+      },
+      "execution_count": 10,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "passages[:3]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "gB7CD1PbxRRU",
+        "outputId": "4d1230bf-0981-4b35-b9d1-c86f1ed4dd42"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[\"An electric fish is a fish that can make electric fields. Many fish (sharks, rays, and catfish) can detect electric fields: they are 'electroreceptive'. They cannot make electric fields, and are not called electric fish.\",\n",
+              " 'Pilot fish (\"Naucrates ductor\") are fish that live in many places of the world. They live in warm water. They eat parasites on larger fish.',\n",
+              " 'Basil (\"Ocimum basilicum\") ( or ) is a plant of the Family Lamiaceae. It is also known as Sweet Basil or Tulsi. It is a tender low-growing herb that is grown as a perennial in warm, tropical climates. Basil is originally native to India and other tropical regions of Asia. It has been cultivated there for more than 5,000 years. It is prominently featured in many cuisines throughout the world. Some of them are Italian, Thai, Vietnamese and Laotian cuisines. It grows to between 30–60\\xa0cm tall. It has light green, silky leaves 3–5\\xa0cm long and 1–3\\xa0cm broad. The leaves are opposite each other. The flowers are quite big. They are white in color and arranged as a spike.']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 11
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_openai import OpenAIEmbeddings\n",
+        "\n",
+        "# details here: https://openai.com/blog/new-embedding-models-and-api-updates\n",
+        "openai_embed_model = OpenAIEmbeddings(model='text-embedding-3-small')"
+      ],
+      "metadata": {
+        "id": "sjxMh_9NxSnR"
+      },
+      "execution_count": 12,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# The vectorstore we'll be using\n",
+        "from langchain_chroma import Chroma\n",
+        "\n",
+        "# The splitting and chunking strategy\n",
+        "from langchain.text_splitter import RecursiveCharacterTextSplitter"
+      ],
+      "metadata": {
+        "id": "W3idvfxExTZf"
+      },
+      "execution_count": 13,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain.docstore.document import Document\n",
+        "\n",
+        "docs = [Document(page_content=doc) for doc in passages]"
+      ],
+      "metadata": {
+        "id": "dVkT1jKzxVsW"
+      },
+      "execution_count": 14,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "docs[:3]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sr_zDgopxWoA",
+        "outputId": "e4f5254f-5cdc-4615-8972-f784fb84d3bc"
+      },
+      "execution_count": 15,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[Document(metadata={}, page_content=\"An electric fish is a fish that can make electric fields. Many fish (sharks, rays, and catfish) can detect electric fields: they are 'electroreceptive'. They cannot make electric fields, and are not called electric fish.\"),\n",
+              " Document(metadata={}, page_content='Pilot fish (\"Naucrates ductor\") are fish that live in many places of the world. They live in warm water. They eat parasites on larger fish.'),\n",
+              " Document(metadata={}, page_content='Basil (\"Ocimum basilicum\") ( or ) is a plant of the Family Lamiaceae. It is also known as Sweet Basil or Tulsi. It is a tender low-growing herb that is grown as a perennial in warm, tropical climates. Basil is originally native to India and other tropical regions of Asia. It has been cultivated there for more than 5,000 years. It is prominently featured in many cuisines throughout the world. Some of them are Italian, Thai, Vietnamese and Laotian cuisines. It grows to between 30–60\\xa0cm tall. It has light green, silky leaves 3–5\\xa0cm long and 1–3\\xa0cm broad. The leaves are opposite each other. The flowers are quite big. They are white in color and arranged as a spike.')]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 15
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "splitter = RecursiveCharacterTextSplitter(chunk_size=3000,\n",
+        "                                          chunk_overlap=200)\n",
+        "chunked_docs = splitter.split_documents(docs)"
+      ],
+      "metadata": {
+        "id": "y9ZMPqoUxXeh"
+      },
+      "execution_count": 16,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "chunked_docs[:3]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hx6QLEpYxYvj",
+        "outputId": "7c57dedc-10d7-4ff7-8e7d-5c0876a8291c"
+      },
+      "execution_count": 17,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[Document(metadata={}, page_content=\"An electric fish is a fish that can make electric fields. Many fish (sharks, rays, and catfish) can detect electric fields: they are 'electroreceptive'. They cannot make electric fields, and are not called electric fish.\"),\n",
+              " Document(metadata={}, page_content='Pilot fish (\"Naucrates ductor\") are fish that live in many places of the world. They live in warm water. They eat parasites on larger fish.'),\n",
+              " Document(metadata={}, page_content='Basil (\"Ocimum basilicum\") ( or ) is a plant of the Family Lamiaceae. It is also known as Sweet Basil or Tulsi. It is a tender low-growing herb that is grown as a perennial in warm, tropical climates. Basil is originally native to India and other tropical regions of Asia. It has been cultivated there for more than 5,000 years. It is prominently featured in many cuisines throughout the world. Some of them are Italian, Thai, Vietnamese and Laotian cuisines. It grows to between 30–60\\xa0cm tall. It has light green, silky leaves 3–5\\xa0cm long and 1–3\\xa0cm broad. The leaves are opposite each other. The flowers are quite big. They are white in color and arranged as a spike.')]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 17
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# create vector DB of docs and embeddings - takes 1 min on Colab\n",
+        "chroma_db = Chroma.from_documents(documents=chunked_docs, collection_name='wiki_db',\n",
+        "                                  embedding=openai_embed_model,\n",
+        "                                  # need to set the distance function to cosine else it uses euclidean by default\n",
+        "                                  # check https://docs.trychroma.com/guides#changing-the-distance-function\n",
+        "                                  collection_metadata={\"hnsw:space\": \"cosine\"},\n",
+        "                                  persist_directory=\"./wiki_db\")"
+      ],
+      "metadata": {
+        "id": "WxaqrJRexaP5"
+      },
+      "execution_count": 18,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# load from disk\n",
+        "chroma_db = Chroma(persist_directory=\"./wiki_db\",\n",
+        "                   collection_name='wiki_db',\n",
+        "                   embedding_function=openai_embed_model)"
+      ],
+      "metadata": {
+        "id": "r54Jllje2509"
+      },
+      "execution_count": 19,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "chroma_db"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Bcyj9qEQ2-mb",
+        "outputId": "f36bb96b-dc43-47eb-bd3d-7cec358da769"
+      },
+      "execution_count": 21,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<langchain_chroma.vectorstores.Chroma at 0x7cb96dab3770>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 21
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "similarity_retriever = chroma_db.as_retriever(search_type=\"similarity_score_threshold\",\n",
+        "                                              search_kwargs={\"k\": 5, \"score_threshold\": 0.2})"
+      ],
+      "metadata": {
+        "id": "zM8dpGfa2_lp"
+      },
+      "execution_count": 22,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_core.prompts import ChatPromptTemplate\n",
+        "\n",
+        "prompt = \"\"\"You are an assistant for question-answering tasks.\n",
+        "            Use the following pieces of retrieved context to answer the question.\n",
+        "            If the answer is not present in the context, just say that you don't know.\n",
+        "            Keep the answer to the point.\n",
+        "\n",
+        "            Question:\n",
+        "            {question}\n",
+        "\n",
+        "            Context:\n",
+        "            {context}\n",
+        "\n",
+        "            Answer:\n",
+        "         \"\"\"\n",
+        "\n",
+        "prompt_template = ChatPromptTemplate.from_template(prompt)"
+      ],
+      "metadata": {
+        "id": "Df7nXbF-3Baz"
+      },
+      "execution_count": 23,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "prompt_template.pretty_print()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "AMZKy3JC3CcS",
+        "outputId": "c8453622-6c6a-4114-aebc-ecfb8263c92b"
+      },
+      "execution_count": 24,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "================================\u001b[1m Human Message \u001b[0m=================================\n",
+            "\n",
+            "You are an assistant for question-answering tasks.\n",
+            "            Use the following pieces of retrieved context to answer the question.\n",
+            "            If the answer is not present in the context, just say that you don't know.\n",
+            "            Keep the answer to the point.\n",
+            "\n",
+            "            Question:\n",
+            "            \u001b[33;1m\u001b[1;3m{question}\u001b[0m\n",
+            "\n",
+            "            Context:\n",
+            "            \u001b[33;1m\u001b[1;3m{context}\u001b[0m\n",
+            "\n",
+            "            Answer:\n",
+            "         \n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_core.runnables import RunnablePassthrough\n",
+        "\n",
+        "def format_docs(docs):\n",
+        "    return \"\\n\\n\".join(doc.page_content for doc in docs)\n",
+        "\n",
+        "qa_rag_chain = (\n",
+        "    {\n",
+        "        \"context\": (similarity_retriever\n",
+        "                      |\n",
+        "                    format_docs),\n",
+        "        \"question\": RunnablePassthrough()\n",
+        "    }\n",
+        "      |\n",
+        "    prompt_template\n",
+        "      |\n",
+        "    chatgpt\n",
+        ")"
+      ],
+      "metadata": {
+        "id": "HcjCrqdj3D5W"
+      },
+      "execution_count": 25,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "query = \"What is the fastest animal?\"\n",
+        "result = qa_rag_chain.invoke(query)\n",
+        "print(result.content)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "kY3WRntV3F1Y",
+        "outputId": "61b6b278-1c97-4761-ed5e-16892c22d5c3"
+      },
+      "execution_count": 26,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "The fastest animal is the cheetah, which can run up to 112 kilometers per hour.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "query = \"Who was the winner of the champions league in 2020?\"\n",
+        "result = qa_rag_chain.invoke(query)\n",
+        "print(result.content)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8-4oCqLz3HGH",
+        "outputId": "9a63f401-5423-4dd2-d991-4f48e59c9206"
+      },
+      "execution_count": 27,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "I don't know.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "query = \"What is the capital of India?\"\n",
+        "result = qa_rag_chain.invoke(query)\n",
+        "print(result.content)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6_2r2gGa3IFj",
+        "outputId": "642f1fcb-f5d5-4eba-8500-ffd70bb62bec"
+      },
+      "execution_count": 28,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "New Delhi is the capital of India.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "query = \"Tell me more about it in detail\"\n",
+        "result = qa_rag_chain.invoke(query)\n",
+        "print(result.content)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "wdSdgy103KSh",
+        "outputId": "cb66ac12-cfb2-423f-b3d7-8ba85a2803de"
+      },
+      "execution_count": 29,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "WARNING:langchain_core.vectorstores.base:No relevant docs were retrieved using the relevance score threshold 0.2\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "I don't know.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Conversational RAG System with LangChain"
+      ],
+      "metadata": {
+        "id": "f_WHSHHh3UIM"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain.chains import create_history_aware_retriever\n",
+        "from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder\n",
+        "\n",
+        "rephrase_system_prompt = \"\"\"Given a chat history and the latest user question\n",
+        "which might reference context in the chat history, formulate a standalone question\n",
+        "which can be understood without the chat history. Do NOT answer the question,\n",
+        "just reformulate it if needed and otherwise return it as is.\n",
+        "\"\"\"\n",
+        "\n",
+        "rephrase_prompt = ChatPromptTemplate.from_messages(\n",
+        "    [\n",
+        "        (\"system\", rephrase_system_prompt),\n",
+        "        MessagesPlaceholder(\"chat_history\"),\n",
+        "        (\"human\", \"{input}\"),\n",
+        "    ]\n",
+        ")\n",
+        "\n",
+        "history_aware_retriever = create_history_aware_retriever(\n",
+        "    chatgpt, similarity_retriever, rephrase_prompt\n",
+        ")"
+      ],
+      "metadata": {
+        "id": "OLg014by3LUt"
+      },
+      "execution_count": 30,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Building the QA RAG Chain with Chat History"
+      ],
+      "metadata": {
+        "id": "yFZzH7zF4j6v"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain.chains import create_retrieval_chain\n",
+        "from langchain.chains.combine_documents import create_stuff_documents_chain\n",
+        "\n",
+        "qa_system_prompt = \"\"\"You are an assistant for question-answering tasks.\n",
+        "                      Use the following pieces of retrieved context to answer the question.\n",
+        "                      If the answer is not present in the context, just say that you don't know.\n",
+        "                      Keep the answer to the point.\n",
+        "\n",
+        "                      Context:\n",
+        "                      {context}\n",
+        "\n",
+        "                  \"\"\"\n",
+        "\n",
+        "qa_prompt = ChatPromptTemplate.from_messages(\n",
+        "    [\n",
+        "        (\"system\", qa_system_prompt),\n",
+        "        MessagesPlaceholder(\"chat_history\"),\n",
+        "        (\"human\", \"\"\"Question:\n",
+        "                     {input}\n",
+        "\n",
+        "                     Answer:\n",
+        "                  \"\"\"),\n",
+        "    ]\n",
+        ")\n",
+        "\n",
+        "question_answer_chain = create_stuff_documents_chain(chatgpt, qa_prompt)\n",
+        "qa_rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)"
+      ],
+      "metadata": {
+        "id": "fZByIMK03PKC"
+      },
+      "execution_count": 32,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "chat_history = []\n",
+        "\n",
+        "question = \"What is the capital of India?\"\n",
+        "response = qa_rag_chain.invoke({\"input\": question, \"chat_history\": chat_history})\n",
+        "print(response['answer'])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "BZ3jH4qc4i_1",
+        "outputId": "36c39b39-0025-4b79-d27a-95689c4e961a"
+      },
+      "execution_count": 34,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "The capital of India is New Delhi.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "chat_history"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ysuO1aIz4soU",
+        "outputId": "cb0f1c8c-fbef-4b77-a861-a16cf56d4b10"
+      },
+      "execution_count": 35,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 35
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain_core.messages import HumanMessage, AIMessage\n",
+        "\n",
+        "chat_history.extend([HumanMessage(content=question),\n",
+        "                     AIMessage(content=response[\"answer\"])])\n",
+        "chat_history"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "I9la4qjX4voK",
+        "outputId": "e2260e6e-a4be-4b2e-f23f-0900e81780b3"
+      },
+      "execution_count": 36,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[HumanMessage(content='What is the capital of India?', additional_kwargs={}, response_metadata={}),\n",
+              " AIMessage(content='The capital of India is New Delhi.', additional_kwargs={}, response_metadata={})]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 36
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "question = \"Tell me more about this city\"\n",
+        "response = qa_rag_chain.invoke({\"input\": question, \"chat_history\": chat_history})\n",
+        "print(response['answer'])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "252sL4c14xJr",
+        "outputId": "fc9ca62c-fac3-4d81-ba19-52fe39b26610"
+      },
+      "execution_count": 37,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "New Delhi is the capital of India and a union territory of the megacity of Delhi. It has a rich history and is home to several monuments. The city is known for being expensive to live in and falls under the North Indian geographical zone. New Delhi covers an area of about 42.7 km and has a population of approximately 9.4 million people.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "chat_history.extend([HumanMessage(content=question),\n",
+        "                     AIMessage(content=response[\"answer\"])])\n",
+        "chat_history"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "AeB2uU0K4yn7",
+        "outputId": "87341040-3d86-47f2-fbfb-bf708064ab69"
+      },
+      "execution_count": 38,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[HumanMessage(content='What is the capital of India?', additional_kwargs={}, response_metadata={}),\n",
+              " AIMessage(content='The capital of India is New Delhi.', additional_kwargs={}, response_metadata={}),\n",
+              " HumanMessage(content='Tell me more about this city', additional_kwargs={}, response_metadata={}),\n",
+              " AIMessage(content='New Delhi is the capital of India and a union territory of the megacity of Delhi. It has a rich history and is home to several monuments. The city is known for being expensive to live in and falls under the North Indian geographical zone. New Delhi covers an area of about 42.7 km and has a population of approximately 9.4 million people.', additional_kwargs={}, response_metadata={})]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 38
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "question = \"What is the fastest animal?\"\n",
+        "response = qa_rag_chain.invoke({\"input\": question, \"chat_history\": chat_history})\n",
+        "print(response['answer'])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "__YWzhMY4znu",
+        "outputId": "84bf6558-8e08-4746-c69c-8ed18790d5c7"
+      },
+      "execution_count": 39,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "The fastest land animal is the cheetah, which can run up to 112 kilometers per hour for a short time.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "{'input': 'What is the fastest animal?',\n",
+        " 'chat_history': [HumanMessage(content='What is the capital of India?', additional_kwargs={}, response_metadata={}),\n",
+        "  AIMessage(content='The capital of India is New Delhi.', additional_kwargs={}, response_metadata={}),\n",
+        "  HumanMessage(content='Tell me more about this city', additional_kwargs={}, response_metadata={}),\n",
+        "  AIMessage(content='New Delhi is the capital of India and a union territory of the megacity of Delhi. It has a rich history and is home to several monuments. The city is known for being expensive to live in and falls under the North Indian geographical zone. New Delhi covers an area of about 42.7 km and has a population of approximately 9.4 million people.', additional_kwargs={}, response_metadata={})],\n",
+        " 'context': [Document(id='8f316d30-9425-4a6a-a943-74050a459c3f', metadata={}, page_content='A cheetah (\"Acinonyx jubatus\") is a medium large cat which lives in Africa. It is the fastest land animal and can run up to 112 kilometers per hour for a short time. Most cheetahs live in the savannas of Africa. There are a few in Asia. Cheetahs are active during the day, and hunt in the early morning or late evening.'),\n",
+        "  Document(id='d4a97a5d-1eec-42fe-bb5d-3ceed98ad816', metadata={}, page_content='The Bengal tiger (\"Panthera tigris tigris\") is a tiger subspecies native to the Indian subcontinent. It lives in Bhutan, Nepal, Bangladesh and northern India. It is the National animal of both India and Bangladesh.'),\n",
+        "  Document(id='029d5fc4-6b21-47cb-8377-79198a0a12e9', metadata={}, page_content='The South African Cheetah (\"Acinonyx jubatus jubatus\"), also known as Namibian Cheetah, is the nominate subspecies of cheetah native to Southern Africa. It is the most abundant subspecies estimated at more than 6,000 individuals in the wild. Since 1990 and onwards, the population was estimated at approximately 2,500 individuals in Namibia, until 2015, the cheetah population has been increased to more than 3,500 in the country.'),\n",
+        "  Document(id='2fa16428-4d87-4589-bd19-faae04e43531', metadata={}, page_content='Leedsichthys problematicus (\"leeds fish\") was a giant fossil fish of the Jurassic period. It was a pachycormid, a group of extinct ray-finned fishes (Actinopterygii). \"Leedsichthys\" is the largest fish known, with an estimated length of up to 16 meters. The blue whale is twice as long, at 30 metres, but that is a mammal, not a fish.'),\n",
+        "  Document(id='89a0631c-247e-4517-aaa5-d31cbda4671d', metadata={}, page_content='The ocean sunfish (\"Mola mola\", also called the mola or sun fish) is a large ocean fish found in warm and temperate oceans. It is the heaviest known bony fish in the world. It has an almost circular, flattened body. This unusual fish swims by flapping its long pectoral and dorsal fins; the caudal fin is used as a rudder (for steering). Some sunfish have been seen floating on their sides at the top of the sea; they may be using the sun to heat themselves up. They eat crustaceans, starfish, jellyfish, sponges, mollusks, algae, plankton, squid, and small fish.')],\n",
+        " 'answer': 'The fastest land animal is the cheetah, which can run up to 112 kilometers per hour for a short time.'}"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "XQZIxg3A41Ug",
+        "outputId": "5102cb98-06cc-44d7-be57-86bb52c4484d"
+      },
+      "execution_count": 40,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "{'input': 'What is the fastest animal?',\n",
+              " 'chat_history': [HumanMessage(content='What is the capital of India?', additional_kwargs={}, response_metadata={}),\n",
+              "  AIMessage(content='The capital of India is New Delhi.', additional_kwargs={}, response_metadata={}),\n",
+              "  HumanMessage(content='Tell me more about this city', additional_kwargs={}, response_metadata={}),\n",
+              "  AIMessage(content='New Delhi is the capital of India and a union territory of the megacity of Delhi. It has a rich history and is home to several monuments. The city is known for being expensive to live in and falls under the North Indian geographical zone. New Delhi covers an area of about 42.7 km and has a population of approximately 9.4 million people.', additional_kwargs={}, response_metadata={})],\n",
+              " 'context': [Document(id='8f316d30-9425-4a6a-a943-74050a459c3f', metadata={}, page_content='A cheetah (\"Acinonyx jubatus\") is a medium large cat which lives in Africa. It is the fastest land animal and can run up to 112 kilometers per hour for a short time. Most cheetahs live in the savannas of Africa. There are a few in Asia. Cheetahs are active during the day, and hunt in the early morning or late evening.'),\n",
+              "  Document(id='d4a97a5d-1eec-42fe-bb5d-3ceed98ad816', metadata={}, page_content='The Bengal tiger (\"Panthera tigris tigris\") is a tiger subspecies native to the Indian subcontinent. It lives in Bhutan, Nepal, Bangladesh and northern India. It is the National animal of both India and Bangladesh.'),\n",
+              "  Document(id='029d5fc4-6b21-47cb-8377-79198a0a12e9', metadata={}, page_content='The South African Cheetah (\"Acinonyx jubatus jubatus\"), also known as Namibian Cheetah, is the nominate subspecies of cheetah native to Southern Africa. It is the most abundant subspecies estimated at more than 6,000 individuals in the wild. Since 1990 and onwards, the population was estimated at approximately 2,500 individuals in Namibia, until 2015, the cheetah population has been increased to more than 3,500 in the country.'),\n",
+              "  Document(id='2fa16428-4d87-4589-bd19-faae04e43531', metadata={}, page_content='Leedsichthys problematicus (\"leeds fish\") was a giant fossil fish of the Jurassic period. It was a pachycormid, a group of extinct ray-finned fishes (Actinopterygii). \"Leedsichthys\" is the largest fish known, with an estimated length of up to 16 meters. The blue whale is twice as long, at 30 metres, but that is a mammal, not a fish.'),\n",
+              "  Document(id='89a0631c-247e-4517-aaa5-d31cbda4671d', metadata={}, page_content='The ocean sunfish (\"Mola mola\", also called the mola or sun fish) is a large ocean fish found in warm and temperate oceans. It is the heaviest known bony fish in the world. It has an almost circular, flattened body. This unusual fish swims by flapping its long pectoral and dorsal fins; the caudal fin is used as a rudder (for steering). Some sunfish have been seen floating on their sides at the top of the sea; they may be using the sun to heat themselves up. They eat crustaceans, starfish, jellyfish, sponges, mollusks, algae, plankton, squid, and small fish.')],\n",
+              " 'answer': 'The fastest land animal is the cheetah, which can run up to 112 kilometers per hour for a short time.'}"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 40
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "chat_history.extend([HumanMessage(content=question),\n",
+        "                     AIMessage(content=response[\"answer\"])])"
+      ],
+      "metadata": {
+        "id": "_wf8e5EJ42jU"
+      },
+      "execution_count": 41,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "chat_history"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "SA3F8KUQ46Ot",
+        "outputId": "31b7cdff-11d4-4539-c837-61a9fee67840"
+      },
+      "execution_count": 42,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[HumanMessage(content='What is the capital of India?', additional_kwargs={}, response_metadata={}),\n",
+              " AIMessage(content='The capital of India is New Delhi.', additional_kwargs={}, response_metadata={}),\n",
+              " HumanMessage(content='Tell me more about this city', additional_kwargs={}, response_metadata={}),\n",
+              " AIMessage(content='New Delhi is the capital of India and a union territory of the megacity of Delhi. It has a rich history and is home to several monuments. The city is known for being expensive to live in and falls under the North Indian geographical zone. New Delhi covers an area of about 42.7 km and has a population of approximately 9.4 million people.', additional_kwargs={}, response_metadata={}),\n",
+              " HumanMessage(content='What is the fastest animal?', additional_kwargs={}, response_metadata={}),\n",
+              " AIMessage(content='The fastest land animal is the cheetah, which can run up to 112 kilometers per hour for a short time.', additional_kwargs={}, response_metadata={})]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 42
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "chat_history[-2:]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "j_i6HOlj47F1",
+        "outputId": "5e41ab87-3cb5-40b9-e218-71c4da070a73"
+      },
+      "execution_count": 43,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[HumanMessage(content='What is the fastest animal?', additional_kwargs={}, response_metadata={}),\n",
+              " AIMessage(content='The fastest land animal is the cheetah, which can run up to 112 kilometers per hour for a short time.', additional_kwargs={}, response_metadata={})]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 43
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "question = \"Tell me about its different species\"\n",
+        "response = qa_rag_chain.invoke({\"input\": question, \"chat_history\": chat_history})\n",
+        "chat_history.extend([HumanMessage(content=question),\n",
+        "                     AIMessage(content=response[\"answer\"])])\n",
+        "print(response['answer'])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "GzjBmOO748f5",
+        "outputId": "e3ae695c-cc83-4622-be0e-664457146574"
+      },
+      "execution_count": 44,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "There are several subspecies of cheetah:\n",
+            "\n",
+            "1. **South African Cheetah (Acinonyx jubatus jubatus)**: This is the nominate subspecies native to Southern Africa and is the most abundant, with an estimated population of more than 6,000 individuals in the wild.\n",
+            "\n",
+            "2. **Asiatic Cheetah (Acinonyx jubatus venaticus)**: This subspecies is critically endangered and is native to Asia.\n",
+            "\n",
+            "These subspecies differ in their geographical distribution and population status.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Multi-User Conversational RAG System with LangChain"
+      ],
+      "metadata": {
+        "id": "FF2C_HLH5BOs"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!rm memory.db"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "jY1ua6lB49lU",
+        "outputId": "53fc5886-06bd-4c76-b590-d5a8a503047b"
+      },
+      "execution_count": 45,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "rm: cannot remove 'memory.db': No such file or directory\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langchain.chains import create_history_aware_retriever\n",
+        "from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder\n",
+        "from langchain.chains import create_retrieval_chain\n",
+        "from langchain.chains.combine_documents import create_stuff_documents_chain\n",
+        "from langchain_community.chat_message_histories import SQLChatMessageHistory\n",
+        "from langchain_core.runnables.history import RunnableWithMessageHistory\n",
+        "from langchain_core.runnables import RunnablePassthrough\n",
+        "from langchain_core.output_parsers import StrOutputParser\n",
+        "from langchain_openai import ChatOpenAI\n",
+        "\n",
+        "chatgpt = ChatOpenAI(model_name=\"gpt-4o-mini\", temperature=0)\n",
+        "\n",
+        "######### REPHRASER ############\n",
+        "rephrase_system_prompt = \"\"\"Given a chat history and the latest user question\n",
+        "which might reference context in the chat history, formulate a standalone question\n",
+        "which can be understood without the chat history. Do NOT answer the question,\n",
+        "just reformulate it if needed and otherwise return it as is.\"\"\"\n",
+        "\n",
+        "rephrase_prompt = ChatPromptTemplate.from_messages(\n",
+        "    [\n",
+        "        (\"system\", rephrase_system_prompt),\n",
+        "        MessagesPlaceholder(\"chat_history\"),\n",
+        "        (\"human\", \"{input}\"),\n",
+        "    ]\n",
+        ")\n",
+        "\n",
+        "history_aware_retriever = create_history_aware_retriever(\n",
+        "    chatgpt, similarity_retriever, rephrase_prompt\n",
+        ")\n",
+        "\n",
+        "\n",
+        "\n",
+        "######### MULTI_USER RAG RESPONSE GENERATOR ############\n",
+        "qa_system_prompt = \"\"\"You are an assistant for question-answering tasks.\n",
+        "                      Analyze the user question carefully and use the following pieces of\n",
+        "                      retrieved context to answer the question.\n",
+        "                      If the answer is not present in the context, just say that you don't know.\n",
+        "                      Keep the answer to the point.\n",
+        "\n",
+        "                      Context:\n",
+        "                      {context}\n",
+        "                  \"\"\"\n",
+        "\n",
+        "qa_prompt = ChatPromptTemplate.from_messages(\n",
+        "    [\n",
+        "        (\"system\", qa_system_prompt),\n",
+        "        MessagesPlaceholder(\"chat_history\"),\n",
+        "        (\"human\", \"\"\"Question:\n",
+        "                     {input}\n",
+        "\n",
+        "                     Answer:\n",
+        "                  \"\"\"),\n",
+        "    ]\n",
+        ")\n",
+        "\n",
+        "# used to retrieve conversation history from database\n",
+        "# based on a specific user or session ID\n",
+        "def get_session_history_db(session_id):\n",
+        "    history = SQLChatMessageHistory(session_id, \"sqlite:///memory.db\")\n",
+        "    return history\n",
+        "\n",
+        "# subset historical conversations based on last K conversation messages\n",
+        "# here by default we use the last 10 conversations (ai-human) as memory to the input prompt\n",
+        "def memory_buffer_window(messages, lastk_conversations=10):\n",
+        "    return messages[-(lastk_conversations*2):] # each conversation has 2 messages - (human prompt, AI response)\n",
+        "\n",
+        "# custom RAG chain which looks at last K conversational messages\n",
+        "question_answer_chain = (\n",
+        "    RunnablePassthrough.assign(chat_history=lambda x: memory_buffer_window(x[\"chat_history\"]))\n",
+        "      |\n",
+        "    qa_prompt\n",
+        "      |\n",
+        "    chatgpt\n",
+        "      |\n",
+        "    StrOutputParser()\n",
+        ")\n",
+        "qa_rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)\n",
+        "\n",
+        "\n",
+        "############ CONVERSATIONAL RAG CHAIN ####################\n",
+        "conversational_rag_chain = RunnableWithMessageHistory(\n",
+        "    qa_rag_chain,\n",
+        "    get_session_history_db,\n",
+        "    input_messages_key=\"input\",\n",
+        "    history_messages_key=\"chat_history\",\n",
+        "    output_messages_key=\"answer\",\n",
+        ")"
+      ],
+      "metadata": {
+        "id": "nkEaByHq5EBq"
+      },
+      "execution_count": 47,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from IPython.display import display, Markdown\n",
+        "\n",
+        "def conv_rag_chatbot(usersession_id, prompt):\n",
+        "    response = conversational_rag_chain.invoke(\n",
+        "                                {\"input\": prompt},\n",
+        "                                config={\n",
+        "                                    \"configurable\": {\"session_id\": usersession_id}\n",
+        "                                }\n",
+        "    )\n",
+        "    print('Answer:')\n",
+        "    display(Markdown(response['answer']))\n",
+        "    print('Sources:')\n",
+        "    for document in response['context']:\n",
+        "        print(document)\n",
+        "        print()\n",
+        "\n",
+        "    return response"
+      ],
+      "metadata": {
+        "id": "mJC3bd7V5FXi"
+      },
+      "execution_count": 49,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "us_id = 'bond007'\n",
+        "r = conv_rag_chatbot(us_id, 'What is the capital of India?')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 309
+        },
+        "id": "XEQ2a4hy6MuV",
+        "outputId": "3cc3e122-ce3d-4067-d58c-15879771cf3e"
+      },
+      "execution_count": 50,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "/usr/local/lib/python3.12/dist-packages/langchain_core/runnables/history.py:598: LangChainDeprecationWarning: `connection_string` was deprecated in LangChain 0.2.2 and will be removed in 1.0. Use connection instead.\n",
+            "  message_history = self.get_session_history(\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Answer:\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<IPython.core.display.Markdown object>"
+            ],
+            "text/markdown": "The capital of India is New Delhi."
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sources:\n",
+            "page_content='New Delhi () is the capital of India and a union territory of the megacity of Delhi. It has a very old history and is home to several monuments where the city is expensive to live in. In traditional Indian geography it falls under the North Indian zone. The city has an area of about 42.7 km. New Delhi has a population of about 9.4 Million people.'\n",
+            "\n",
+            "page_content='The Republic of India is divided into twenty-eight States,and eight union territories including the National Capital Territory.'\n",
+            "\n",
+            "page_content='Kolkata (spelled Calcutta before 1 January 2001) is the capital city of the Indian state of West Bengal. It is the second largest city in India after Mumbai. It is on the east bank of the River Hooghly. When it is called Calcutta, it includes the suburbs. This makes it the third largest city of India. This also makes it the world's 8th largest metropolitan area as defined by the United Nations. Kolkata served as the capital of India during the British Raj until 1911. Kolkata was once the center of industry and education. However, it has witnessed political violence and economic problems since 1954. Since 2000, Kolkata has grown due to economic growth. Like other metropolitan cities in India, Kolkata struggles with poverty, pollution and traffic congestion.'\n",
+            "\n",
+            "page_content='Gandhinagar is the capital city of Gujarat state in India. It is 23 km from the city of Ahmedabad and 464 km from Mumbai. In the year 1960, the Bombay state of India was divided into two states - Maharashtra and Gujarat. Bombay (now called Mumbai) became the capital city of Maharashtra. For Gujarat, new capital was needed. Gandhinagar was then made the capital of Gujarat.'\n",
+            "\n",
+            "page_content='Chennai (formerly known as Madras) is the capital city of the Indian state of Tamil Nadu. It has a population of about 7 million people. Almost 10% of all of the people in the state live in Chennai. The city is the fourth largest city of India. It was founded in 1661 by the British East India Company. The city is on the Coromandel Coast of the Bay of Bengal.'\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "r = conv_rag_chatbot(us_id, 'Tell me more about it')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 309
+        },
+        "id": "E9-Xk1zG6Q4Q",
+        "outputId": "82737239-bdb4-478d-c776-b7cec417b412"
+      },
+      "execution_count": 51,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Answer:\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<IPython.core.display.Markdown object>"
+            ],
+            "text/markdown": "New Delhi is the capital of India and a union territory of the megacity of Delhi. It has a rich history and is home to several monuments. The city is known for being expensive to live in and falls under the North Indian geographical zone. New Delhi covers an area of about 42.7 km and has a population of approximately 9.4 million people."
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sources:\n",
+            "page_content='New Delhi () is the capital of India and a union territory of the megacity of Delhi. It has a very old history and is home to several monuments where the city is expensive to live in. In traditional Indian geography it falls under the North Indian zone. The city has an area of about 42.7 km. New Delhi has a population of about 9.4 Million people.'\n",
+            "\n",
+            "page_content='Rajpath (, meaning \"King's Way\") is the national boulevard of India. It is in New Delhi, the capital of India. The boulevard starts at the home of the President of India and ends at the National Stadium.'\n",
+            "\n",
+            "page_content='Delhi has the second largest Muslim population (12.86%) within Delhi State. Muhammad Ghori invaded India in 1175 A.D. After the conquest of Multan and Punjab, he advanced towards Delhi. The brave Rajput chiefs of northern India headed by Prithvi Raj Chauhan defeated him in the First Battle of Terrain in 1191 A.D. After about a year, Muhammad Ghori came again to avenge his defeat. A furious battle was fought again in Terrain in 1192 A.D. in which the Rajputs were defeated and Prithvi Raj Chauhan was captured and put to death. The Second Battle of Terrain, however, proved to be a decisive battle that laid the foundations of Muslim rule in Northern India. The period between 1206 A.D. and 1526 A.D. in India's history is known as the Delhi Sultanate period. During this period of over three hundred years, five dynasties ruled in Delhi. These were: the Slave dynasty (1206-90), Khilji dynasty (1290-1320), Tughlaq dynasty (1320-1413), Sayyid dynasty (1414-51), and Lodhi dynasty (1451-1526).'\n",
+            "\n",
+            "page_content='Dwarka (with other spelling as Dvarka) was a city of Ancient India. The city was one of seven holy cities of the Hindus. It is also one of the four most important places of pilgrimage for the Hindus. Hindus call such four places as Dhams. Dwarka is located in the western part of India in Gujarat state. During the birth day of Krishna, and the Hindu festivals of Holi and Divali, thousands of Hindus visit the place.'\n",
+            "\n",
+            "page_content='Kolkata (spelled Calcutta before 1 January 2001) is the capital city of the Indian state of West Bengal. It is the second largest city in India after Mumbai. It is on the east bank of the River Hooghly. When it is called Calcutta, it includes the suburbs. This makes it the third largest city of India. This also makes it the world's 8th largest metropolitan area as defined by the United Nations. Kolkata served as the capital of India during the British Raj until 1911. Kolkata was once the center of industry and education. However, it has witnessed political violence and economic problems since 1954. Since 2000, Kolkata has grown due to economic growth. Like other metropolitan cities in India, Kolkata struggles with poverty, pollution and traffic congestion.'\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "us_id = 'jim003'\n",
+        "r = conv_rag_chatbot(us_id, 'What is the fastest animal on land?')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 275
+        },
+        "id": "iJNT_h536UPa",
+        "outputId": "fd131779-a754-4d89-a305-3ef5c551e689"
+      },
+      "execution_count": 52,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Answer:\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<IPython.core.display.Markdown object>"
+            ],
+            "text/markdown": "The fastest land animal is the cheetah, which can run up to 112 kilometers per hour for a short time."
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sources:\n",
+            "page_content='A cheetah (\"Acinonyx jubatus\") is a medium large cat which lives in Africa. It is the fastest land animal and can run up to 112 kilometers per hour for a short time. Most cheetahs live in the savannas of Africa. There are a few in Asia. Cheetahs are active during the day, and hunt in the early morning or late evening.'\n",
+            "\n",
+            "page_content='The South African Cheetah (\"Acinonyx jubatus jubatus\"), also known as Namibian Cheetah, is the nominate subspecies of cheetah native to Southern Africa. It is the most abundant subspecies estimated at more than 6,000 individuals in the wild. Since 1990 and onwards, the population was estimated at approximately 2,500 individuals in Namibia, until 2015, the cheetah population has been increased to more than 3,500 in the country.'\n",
+            "\n",
+            "page_content='Leedsichthys problematicus (\"leeds fish\") was a giant fossil fish of the Jurassic period. It was a pachycormid, a group of extinct ray-finned fishes (Actinopterygii). \"Leedsichthys\" is the largest fish known, with an estimated length of up to 16 meters. The blue whale is twice as long, at 30 metres, but that is a mammal, not a fish.'\n",
+            "\n",
+            "page_content='A coelacanth is a type of fish in the Sarcopterygii, the lobe-finned fishes. They are a sister group to those fish which evolved into tetrapods. Their fossil record goes back 400 million years, before any land vertebrates had evolved.'\n",
+            "\n",
+            "page_content='Pallas's fish eagle (\"Haliaeetus leucoryphus\"), also known as Pallas's sea eagle or band-tailed fish eagle, is a large, brownish sea eagle. It breeds in the east Palearctic in Kazakhstan, Russia, Tajikistan, Turkmenistan, Uzbekistan, Mongolia, China, India, Bangladesh, Myanmar and Bhutan. It is listed as endangered on the IUCN Red List.'\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "us_id = 'bond007'\n",
+        "r = conv_rag_chatbot(us_id, 'Tell me about wildlife in India')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 327
+        },
+        "id": "UYMvGqVq6VdF",
+        "outputId": "39e642ef-91fd-432d-9d77-33c7d6188ed0"
+      },
+      "execution_count": 53,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Answer:\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<IPython.core.display.Markdown object>"
+            ],
+            "text/markdown": "India is home to a diverse range of wildlife, including various species of mammals, birds, reptiles, and amphibians. Notable animals include the Bengal tiger, which is native to the Indian subcontinent and is the national animal of India, and the Indian elephant, which is listed as endangered. The country has numerous national parks and wildlife sanctuaries that protect these species and their habitats. The Wildlife Protection Act of 1972 was established to safeguard wildlife in India."
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sources:\n",
+            "page_content='The Bengal tiger (\"Panthera tigris tigris\") is a tiger subspecies native to the Indian subcontinent. It lives in Bhutan, Nepal, Bangladesh and northern India. It is the National animal of both India and Bangladesh.'\n",
+            "\n",
+            "page_content='The Wildlife Protection Act of 1972 is a set of laws created in 1972 by the Government of India. Before 1972, India had only five national parks.'\n",
+            "\n",
+            "page_content='The Bengal Fox (\"Vulpes bengalensis\"), also known as the Indian Fox, is a fox. It is endemic to the Indian subcontinent, and is found from the Himalayan foothills and Terai of Nepal through southern India and from southern and eastern Pakistan to eastern India and southeastern Bangladesh.'\n",
+            "\n",
+            "page_content='There are lots of different varieties of Indian music. Most of the different types of music are similar to Western music types. Pop, classical, and folk are all included. India’s classical music has a history originating hundreds of years back and is still popular in India today, as religious inspiration or pure entertainment. Like Africa, India has many different ethnic groups, speaking their own languages, and having very distinct cultural traditions.'\n",
+            "\n",
+            "page_content='The Indian elephant (\"Elephas maximus indicus\") is one of three subspecies of the Asian elephant. It comes from mainland Asia. Since 1986, Elephants \"maximus\" has been listed as endangered by IUCN. The population has declined by at least 50% over the last 60–75 years. The species is also threatened by habitat loss, degradation and herds being split apart into smaller groups. In India it is recognized as the National animal of the country.'\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "us_id = 'jim003'\n",
+        "r = conv_rag_chatbot(us_id, 'tell me more about its different species')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 395
+        },
+        "id": "KbsbkBO46W0N",
+        "outputId": "be81a18c-b975-4abd-8cc8-db3ddd16a3dc"
+      },
+      "execution_count": 54,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Answer:\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<IPython.core.display.Markdown object>"
+            ],
+            "text/markdown": "There are several subspecies of cheetah:\n\n1. **South African Cheetah (Acinonyx jubatus jubatus)**: This is the nominate subspecies native to Southern Africa and is the most abundant, with an estimated population of more than 6,000 individuals in the wild.\n\n2. **Asiatic Cheetah (Acinonyx jubatus venaticus)**: This subspecies is critically endangered and is native to Asia.\n\nThese subspecies highlight the diversity within the cheetah population, with the South African Cheetah being more numerous compared to the critically endangered Asiatic Cheetah."
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Sources:\n",
+            "page_content='A cheetah (\"Acinonyx jubatus\") is a medium large cat which lives in Africa. It is the fastest land animal and can run up to 112 kilometers per hour for a short time. Most cheetahs live in the savannas of Africa. There are a few in Asia. Cheetahs are active during the day, and hunt in the early morning or late evening.'\n",
+            "\n",
+            "page_content='The South African Cheetah (\"Acinonyx jubatus jubatus\"), also known as Namibian Cheetah, is the nominate subspecies of cheetah native to Southern Africa. It is the most abundant subspecies estimated at more than 6,000 individuals in the wild. Since 1990 and onwards, the population was estimated at approximately 2,500 individuals in Namibia, until 2015, the cheetah population has been increased to more than 3,500 in the country.'\n",
+            "\n",
+            "page_content='The Asiatic cheetah (\"Acinonyx jubatus venaticus\") is a critically endangered subspecies of the cheetah native to Asia.'\n",
+            "\n",
+            "page_content='The Felinae is a subfamily of the Felidae. It includes small cats and a few medium-large cats, especially the cougar (\"Puma concolor\") and the cheetah (\"Acinonyx jubatus\").'\n",
+            "\n",
+            "page_content='The Cheetah is a fictional character, created by William Moulton Marston. She appears in DC Comics publications and related media, commonly as a major villain to the superhero Wonder Woman.'\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "FAg0vbWE6YKD"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
