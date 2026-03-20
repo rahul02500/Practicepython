@@ -1,20 +1,4 @@
 {
-  "nbformat": 4,
-  "nbformat_minor": 0,
-  "metadata": {
-    "colab": {
-      "provenance": [],
-      "authorship_tag": "ABX9TyMOXpGbwGulCpt7n26gw+Ac",
-      "include_colab_link": true
-    },
-    "kernelspec": {
-      "name": "python3",
-      "display_name": "Python 3"
-    },
-    "language_info": {
-      "name": "python"
-    }
-  },
   "cells": [
     {
       "cell_type": "markdown",
@@ -28,21 +12,23 @@
     },
     {
       "cell_type": "code",
-      "execution_count": 1,
+      "source": [
+        "!pip install openai colorama"
+      ],
       "metadata": {
+        "id": "eggUMrMj5IKE",
+        "outputId": "b6bf74b4-5c8e-478a-b1d5-fea3fa52947a",
         "colab": {
           "base_uri": "https://localhost:8080/"
-        },
-        "collapsed": true,
-        "id": "NyuulR2BwUfY",
-        "outputId": "729c4cfc-1ad5-4ea2-e73a-4151042b89e4"
+        }
       },
+      "execution_count": 1,
       "outputs": [
         {
           "output_type": "stream",
           "name": "stdout",
           "text": [
-            "Requirement already satisfied: openai in /usr/local/lib/python3.12/dist-packages (2.23.0)\n",
+            "Requirement already satisfied: openai in /usr/local/lib/python3.12/dist-packages (2.28.0)\n",
             "Collecting colorama\n",
             "  Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)\n",
             "Requirement already satisfied: anyio<5,>=3.5.0 in /usr/local/lib/python3.12/dist-packages (from openai) (4.12.1)\n",
@@ -54,7 +40,7 @@
             "Requirement already satisfied: tqdm>4 in /usr/local/lib/python3.12/dist-packages (from openai) (4.67.3)\n",
             "Requirement already satisfied: typing-extensions<5,>=4.11 in /usr/local/lib/python3.12/dist-packages (from openai) (4.15.0)\n",
             "Requirement already satisfied: idna>=2.8 in /usr/local/lib/python3.12/dist-packages (from anyio<5,>=3.5.0->openai) (3.11)\n",
-            "Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->openai) (2026.1.4)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->openai) (2026.2.25)\n",
             "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->openai) (1.0.9)\n",
             "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->openai) (0.16.0)\n",
             "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3,>=1.9.0->openai) (0.7.0)\n",
@@ -65,42 +51,11 @@
             "Successfully installed colorama-0.4.6\n"
           ]
         }
-      ],
-      "source": [
-        "!pip install openai colorama"
       ]
-    },
-    {
-      "cell_type": "markdown",
-      "source": [
-        "#Reflection Patter"
-      ],
-      "metadata": {
-        "id": "yoUfGU-ewgBs"
-      }
-    },
-    {
-      "cell_type": "markdown",
-      "source": [
-        "##Generation Step"
-      ],
-      "metadata": {
-        "id": "_R3uTW5zwoDZ"
-      }
-    },
-    {
-      "cell_type": "markdown",
-      "source": [
-        "OpenAI Client and relevant imports"
-      ],
-      "metadata": {
-        "id": "n5Yw0rosw-kJ"
-      }
     },
     {
       "cell_type": "code",
       "source": [
-        "from httpx import Client\n",
         "import os\n",
         "from pprint import pprint\n",
         "from IPython.display import display_markdown\n",
@@ -108,14 +63,16 @@
         "\n",
         "from openai import OpenAI\n",
         "\n",
-        "Client = OpenAI(api_key=userdata.get('Open_API_key'))\n",
-        "\n",
+        "# Remember to add your OpenAI API Key to the user data\n",
+        "client = OpenAI(\n",
+        "    api_key=userdata.get('OPENAI_API_KEY')\n",
+        ")\n",
         "model = \"gpt-4o\""
       ],
       "metadata": {
-        "id": "_vZQpPKpwakJ"
+        "id": "6VvMnwlD5Rdh"
       },
-      "execution_count": 6,
+      "execution_count": 2,
       "outputs": []
     },
     {
@@ -131,9 +88,9 @@
         "]"
       ],
       "metadata": {
-        "id": "n5XddZzBxNET"
+        "id": "Wis0grC15eQK"
       },
-      "execution_count": 7,
+      "execution_count": 3,
       "outputs": []
     },
     {
@@ -147,9 +104,9 @@
         ")"
       ],
       "metadata": {
-        "id": "cZLcH6jeygBS"
+        "id": "-0ia9frk5nra"
       },
-      "execution_count": 8,
+      "execution_count": 4,
       "outputs": []
     },
     {
@@ -158,13 +115,13 @@
         "generation_chat_history"
       ],
       "metadata": {
+        "id": "z5WPYiZ95urP",
+        "outputId": "c406a15b-a096-40ab-ed8e-998ccb0ac7fe",
         "colab": {
           "base_uri": "https://localhost:8080/"
-        },
-        "id": "r4NWkrRNyjIR",
-        "outputId": "11817d50-5b0b-4526-ff85-881e4eb3a066"
+        }
       },
-      "execution_count": 9,
+      "execution_count": 5,
       "outputs": [
         {
           "output_type": "execute_result",
@@ -177,14 +134,14 @@
             ]
           },
           "metadata": {},
-          "execution_count": 9
+          "execution_count": 5
         }
       ]
     },
     {
       "cell_type": "code",
       "source": [
-        "mergesort_code = Client.chat.completions.create(\n",
+        "mergesort_code = client.chat.completions.create(\n",
         "    messages=generation_chat_history,\n",
         "    model=model\n",
         ").choices[0].message.content\n",
@@ -197,9 +154,9 @@
         ")"
       ],
       "metadata": {
-        "id": "6WHCOeO-yk4T"
+        "id": "jNJfXRw75xTm"
       },
-      "execution_count": 13,
+      "execution_count": 6,
       "outputs": []
     },
     {
@@ -208,19 +165,19 @@
         "display_markdown(mergesort_code, raw=True)"
       ],
       "metadata": {
+        "id": "tWX4Qd585yBv",
+        "outputId": "d54daa9c-8502-4de0-98fb-037ed1cfcd03",
         "colab": {
           "base_uri": "https://localhost:8080/",
-          "height": 951
-        },
-        "id": "jP8B8Mhwyl_M",
-        "outputId": "a3328907-9652-42c4-e45d-3e2f7001bb8a"
+          "height": 1000
+        }
       },
-      "execution_count": 14,
+      "execution_count": 7,
       "outputs": [
         {
           "output_type": "display_data",
           "data": {
-            "text/markdown": "Here's an optimized Python implementation of the Merge Sort algorithm, incorporating improvements and clarity:\n\n```python\ndef merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n\n    mid = len(arr) // 2\n    left_half = merge_sort(arr[:mid])\n    right_half = merge_sort(arr[mid:])\n    \n    return merge(left_half, right_half)\n\ndef merge(left, right):\n    sorted_array = []\n    left_index, right_index = 0, 0\n    \n    # Compare elements from left and right subarrays\n    while left_index < len(left) and right_index < len(right):\n        if left[left_index] <= right[right_index]:\n            sorted_array.append(left[left_index])\n            left_index += 1\n        else:\n            sorted_array.append(right[right_index])\n            right_index += 1\n    \n    # Extend the sorted_array with any remaining elements\n    sorted_array.extend(left[left_index:])\n    sorted_array.extend(right[right_index:])\n\n    return sorted_array\n\n# Sample usage\nif __name__ == \"__main__\":\n    example_array = [38, 27, 43, 3, 9, 82, 10]\n    sorted_array = merge_sort(example_array)\n    print(\"Sorted array:\", sorted_array)\n```\n\n### Key Points:\n\n1. **Base Case**: If the list contains zero or one element, it is inherently sorted. The function immediately returns it.\n\n2. **Recursion**: The list is divided by finding the middle index, recursively sorting the two halves, and then merging the sorted halves.\n\n3. **Merging**: The `merge` function uses two indices to track and compare elements in the two sorted halves. The `extend` method efficiently appends any remaining elements once one subarray is exhausted.\n\n4. **Efficiency**: This method maintains the \\(O(n \\log n)\\) time complexity of merge sort and intelligently manages space complexity through slicing and temporary storage in the `sorted_array`.\n\nThis version of Merge Sort is concise, easy to understand, and demonstrates the algorithm's principles effectively."
+            "text/markdown": "Certainly! Below is a Python implementation of the Merge Sort algorithm. Merge Sort is a classic, efficient, and stable sorting algorithm with a time complexity of \\(O(n \\log n)\\).\n\n```python\ndef merge_sort(arr):\n    if len(arr) > 1:\n        # Find the middle of the array\n        mid = len(arr) // 2\n\n        # Divide the array into two halves\n        left_half = arr[:mid]\n        right_half = arr[mid:]\n\n        # Recursively sort the two halves\n        merge_sort(left_half)\n        merge_sort(right_half)\n\n        # Indices for traversing the two halves and the main array\n        i = j = k = 0\n\n        # Merge the two halves\n        while i < len(left_half) and j < len(right_half):\n            if left_half[i] < right_half[j]:\n                arr[k] = left_half[i]\n                i += 1\n            else:\n                arr[k] = right_half[j]\n                j += 1\n            k += 1\n\n        # Copy any remaining elements from left_half, if any\n        while i < len(left_half):\n            arr[k] = left_half[i]\n            i += 1\n            k += 1\n\n        # Copy any remaining elements from right_half, if any\n        while j < len(right_half):\n            arr[k] = right_half[j]\n            j += 1\n            k += 1\n\n# Example usage:\narr = [38, 27, 43, 3, 9, 82, 10]\nprint(\"Original array:\", arr)\nmerge_sort(arr)\nprint(\"Sorted array:\", arr)\n```\n\n### Explanation\n1. **Divide**: Split the array into two halves until each subarray contains only one element.\n2. **Conquer**: Recursively sort each half.\n3. **Combine**: Merge the sorted halves to produce the sorted whole by comparing the front elements and selecting the smaller element to insert into the main array.\n4. **Repeat**: Continue until the entire array is sorted. \n\nThis implementation uses recursion to break down the array until basic elements are reached, sorted, and merged back into one sorted array."
           },
           "metadata": {}
         }
@@ -237,9 +194,9 @@
         "]"
       ],
       "metadata": {
-        "id": "aNzv-NwpIZBt"
+        "id": "20WUNq6i6Ez6"
       },
-      "execution_count": 15,
+      "execution_count": 11,
       "outputs": []
     },
     {
@@ -253,24 +210,48 @@
         ")"
       ],
       "metadata": {
-        "id": "47DiSkdzIcc9"
+        "id": "mFU3cXTY61eN"
       },
-      "execution_count": 16,
+      "execution_count": 13,
       "outputs": []
     },
     {
       "cell_type": "code",
       "source": [
-        "critique = Client.chat.completions.create(\n",
+        "critique = client.chat.completions.create(\n",
         "    messages=reflection_chat_history,\n",
         "    model=model\n",
         ").choices[0].message.content"
       ],
       "metadata": {
-        "id": "hHtXmEV4IduA"
+        "id": "_T_-aI6l6gTT"
       },
-      "execution_count": 18,
+      "execution_count": 12,
       "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "display_markdown(critique, raw=True)"
+      ],
+      "metadata": {
+        "id": "DrutzWU46hA9",
+        "outputId": "d6ab0aff-3945-4360-befe-ec69abaf08db",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 46
+        }
+      },
+      "execution_count": 14,
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/markdown": "Sure, I'd be happy to help critique your code and offer recommendations. Please provide the code you'd like me to review."
+          },
+          "metadata": {}
+        }
+      ]
     },
     {
       "cell_type": "code",
@@ -283,23 +264,23 @@
         ")"
       ],
       "metadata": {
-        "id": "YZtoUeSPIfsv"
+        "id": "j2cxHA5U64N4"
       },
-      "execution_count": 19,
+      "execution_count": 15,
       "outputs": []
     },
     {
       "cell_type": "code",
       "source": [
-        "essay = Client.chat.completions.create(\n",
+        "essay = client.chat.completions.create(\n",
         "    messages=generation_chat_history,\n",
         "    model=model\n",
         ").choices[0].message.content"
       ],
       "metadata": {
-        "id": "50X965CdIlpJ"
+        "id": "IwtBfKVY7Cy_"
       },
-      "execution_count": 21,
+      "execution_count": 18,
       "outputs": []
     },
     {
@@ -308,19 +289,19 @@
         "display_markdown(essay, raw=True)"
       ],
       "metadata": {
+        "id": "VtD5FFup7Dn3",
+        "outputId": "bd5b467e-20ea-43f5-a89e-7d8ee1d5b998",
         "colab": {
           "base_uri": "https://localhost:8080/",
-          "height": 1000
-        },
-        "id": "8FkwSX5lInAb",
-        "outputId": "02756103-18d8-4a9d-c55e-f4ad43a97a20"
+          "height": 822
+        }
       },
-      "execution_count": 22,
+      "execution_count": 19,
       "outputs": [
         {
           "output_type": "display_data",
           "data": {
-            "text/markdown": "Thank you for your thoughtful feedback! Here’s an updated version of the Merge Sort algorithm, incorporating your suggestions for improvements and considerations:\n\n```python\nfrom typing import List\n\ndef merge_sort(arr: List[int]) -> List[int]:\n    \"\"\"Sorts an array of integers using the merge sort algorithm.\"\"\"\n    if len(arr) <= 1:\n        return arr\n\n    mid = len(arr) // 2\n    left_half = merge_sort(arr[:mid])\n    right_half = merge_sort(arr[mid:])\n\n    return merge(left_half, right_half)\n\ndef merge(left: List[int], right: List[int]) -> List[int]:\n    \"\"\"Merges two sorted arrays into a single sorted array.\"\"\"\n    sorted_array = []\n    left_index, right_index = 0, 0\n    \n    # Merge the sorted halves\n    while left_index < len(left) and right_index < len(right):\n        if left[left_index] <= right[right_index]:\n            sorted_array.append(left[left_index])\n            left_index += 1\n        else:\n            sorted_array.append(right[right_index])\n            right_index += 1\n    \n    # Append remaining elements from left and right\n    sorted_array.extend(left[left_index:])\n    sorted_array.extend(right[right_index:])\n\n    return sorted_array\n\n# Sample usage and tests\nif __name__ == \"__main__\":\n    example_array = [38, 27, 43, 3, 9, 82, 10]\n    print(\"Original array:\", example_array)\n    sorted_array = merge_sort(example_array)\n    print(\"Sorted array:\", sorted_array)\n    \n    # Additional test cases\n    assert merge_sort([]) == []\n    assert merge_sort([1]) == [1]\n    assert merge_sort([2, 1]) == [1, 2]\n    assert merge_sort([5, 2, 9, 1, 5, 6]) == [1, 2, 5, 5, 6, 9]\n    assert merge_sort([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]\n    assert merge_sort([5, 4, 3, 2, 1]) == [1, 2, 3, 4, 5]\n\n    # Edge case with large numbers\n    large_array = [i for i in range(1000, 0, -1)]\n    assert merge_sort(large_array) == list(range(1, 1001))\n\nprint(\"All tests passed.\")\n```\n\n### Key Revisions:\n\n1. **Type Annotations**: I've added type annotations to the function signatures, improving readability and providing clear expectations for input and output types.\n\n2. **Comments**: Documentation strings have been added to the main functions to clarify their purpose and functionalities.\n\n3. **Comprehensive Tests**: Additional test cases cover various scenarios, including empty arrays, single-element arrays, sorted and reverse-sorted arrays, and even large datasets. Assertions are used to validate that the function behaves as expected.\n\n4. **Edge Case Handling**: The implementation inherently manages edge cases, but more extensive testing illustrates robustness, especially with large or specific input conditions.\n\n5. **Clarity and Idiomatic Usage**: Code blows maintain a balance between Pythonic idioms for clarity and performance considerations. While using indices might reduce memory consumption, the current slicing maintains clear readability, which is often a priority in Python. \n\nThis updated version should address your feedback while maintaining the balance between complexity, performance, and readability."
+            "text/markdown": "Sure! Here's the Python implementation of the Merge Sort algorithm for your review:\n\n```python\ndef merge_sort(arr):\n    if len(arr) > 1:\n        # Find the middle of the array\n        mid = len(arr) // 2\n\n        # Divide the array into two halves\n        left_half = arr[:mid]\n        right_half = arr[mid:]\n\n        # Recursively sort the two halves\n        merge_sort(left_half)\n        merge_sort(right_half)\n\n        # Indices for traversing the two halves and the main array\n        i = j = k = 0\n\n        # Merge the two halves\n        while i < len(left_half) and j < len(right_half):\n            if left_half[i] < right_half[j]:\n                arr[k] = left_half[i]\n                i += 1\n            else:\n                arr[k] = right_half[j]\n                j += 1\n            k += 1\n\n        # Copy any remaining elements from left_half, if any\n        while i < len(left_half):\n            arr[k] = left_half[i]\n            i += 1\n            k += 1\n\n        # Copy any remaining elements from right_half, if any\n        while j < len(right_half):\n            arr[k] = right_half[j]\n            j += 1\n            k += 1\n\n# Example usage:\narr = [38, 27, 43, 3, 9, 82, 10]\nprint(\"Original array:\", arr)\nmerge_sort(arr)\nprint(\"Sorted array:\", arr)\n```\n\nPlease feel free to offer your critique or suggest any recommendations you have for improving this implementation."
           },
           "metadata": {}
         }
@@ -456,9 +437,9 @@
         "    fancy_print(f\"STEP {step + 1}/{total_steps}\")"
       ],
       "metadata": {
-        "id": "x452jzFqIs84"
+        "id": "CFnumkuq7En4"
       },
-      "execution_count": 24,
+      "execution_count": 21,
       "outputs": []
     },
     {
@@ -490,7 +471,7 @@
         "\n",
         "    def __init__(self, model: str = \"gpt-4o\"):\n",
         "        self.client = OpenAI(\n",
-        "          api_key=userdata.get('Open_API_key')\n",
+        "          api_key=userdata.get('OPENAI_API_KEY')\n",
         "        )\n",
         "        self.model = model\n",
         "\n",
@@ -574,6 +555,11 @@
         "        generation_system_prompt += BASE_GENERATION_SYSTEM_PROMPT\n",
         "        reflection_system_prompt += BASE_REFLECTION_SYSTEM_PROMPT\n",
         "\n",
+        "        # Given the iterative nature of the Reflection Pattern, we might exhaust the LLM context (or\n",
+        "        # make it really slow). That's the reason I'm limitting the chat history to three messages.\n",
+        "        # The `FixedFirstChatHistory` is a very simple class, that creates a Queue that always keeps\n",
+        "        # fixed the first message. I thought this would be useful for maintaining the system prompt\n",
+        "        # in the chat history.\n",
         "        generation_history = FixedFirstChatHistory(\n",
         "            [\n",
         "                build_prompt_structure(prompt=generation_system_prompt, role=\"system\"),\n",
@@ -591,21 +577,23 @@
         "            if verbose > 0:\n",
         "                fancy_step_tracker(step, n_steps)\n",
         "\n",
+        "            # Generate the response\n",
         "            generation = self.generate(generation_history, verbose=verbose)\n",
         "            update_chat_history(generation_history, generation, \"assistant\")\n",
         "            update_chat_history(reflection_history, generation, \"user\")\n",
         "\n",
+        "            # Reflect and critique the generation\n",
         "            critique = self.reflect(reflection_history, verbose=verbose)\n",
         "\n",
         "            update_chat_history(generation_history, critique, \"user\")\n",
         "            update_chat_history(reflection_history, critique, \"assistant\")\n",
         "\n",
-        "        return generation"
+        "        return generation\n"
       ],
       "metadata": {
-        "id": "SeccokxqIuX6"
+        "id": "JRfPlCM3-4K8"
       },
-      "execution_count": 27,
+      "execution_count": 22,
       "outputs": []
     },
     {
@@ -614,9 +602,9 @@
         "agent = ReflectionAgent()"
       ],
       "metadata": {
-        "id": "SkpNfUnwJHR8"
+        "id": "gN2BBH5iB2e1"
       },
-      "execution_count": 28,
+      "execution_count": 23,
       "outputs": []
     },
     {
@@ -629,9 +617,9 @@
         "user_msg = \"Generate a Python implementation of the Merge Sort algorithm\""
       ],
       "metadata": {
-        "id": "hgQEuJiWMRui"
+        "id": "refN9MWIB39p"
       },
-      "execution_count": 29,
+      "execution_count": 24,
       "outputs": []
     },
     {
@@ -646,13 +634,13 @@
         ")"
       ],
       "metadata": {
+        "id": "Ku2WvZhfB4um",
+        "outputId": "74f7c838-1253-491c-8d4e-e19f674dd87f",
         "colab": {
           "base_uri": "https://localhost:8080/"
-        },
-        "id": "9xinxFpoMeIJ",
-        "outputId": "6ed30227-0522-4aa8-d29a-8d24b5673f39"
+        }
       },
-      "execution_count": 30,
+      "execution_count": 25,
       "outputs": [
         {
           "output_type": "stream",
@@ -667,48 +655,46 @@
             "\n",
             "GENERATION\n",
             "\n",
-            " Certainly! Below is a Python implementation of the Merge Sort algorithm. This implementation is both efficient and easy to understand, leveraging the divide-and-conquer strategy to sort a list:\n",
+            " Certainly! Below is a Python implementation of the Merge Sort algorithm. This implementation uses a recursive approach to divide the array into subarrays, sort each part, and then merge the sorted subarrays back into a single sorted array.\n",
             "\n",
             "```python\n",
             "def merge_sort(arr):\n",
-            "    # Base case: a list of zero or one elements is sorted, by definition\n",
+            "    # Base case: if the array has less than or equal to 1 element, it's already sorted\n",
             "    if len(arr) <= 1:\n",
             "        return arr\n",
             "\n",
-            "    # Recursive case. First, divide the list into equal-sized sublists\n",
+            "    # Find the middle point to divide the array into two halves\n",
             "    mid = len(arr) // 2\n",
+            "\n",
+            "    # Recursively sort each half\n",
             "    left_half = merge_sort(arr[:mid])\n",
             "    right_half = merge_sort(arr[mid:])\n",
             "\n",
-            "    # Merge the sorted sublists\n",
+            "    # Merge the sorted halves\n",
             "    return merge(left_half, right_half)\n",
             "\n",
             "def merge(left, right):\n",
-            "    merged = []\n",
+            "    sorted_array = []\n",
             "    i = j = 0\n",
             "\n",
-            "    # Compare elements from each sublist and merge them in sorted order\n",
+            "    # Compare elements from both halves and merge them in sorted order\n",
             "    while i < len(left) and j < len(right):\n",
-            "        if left[i] < right[j]:\n",
-            "            merged.append(left[i])\n",
+            "        if left[i] <= right[j]:\n",
+            "            sorted_array.append(left[i])\n",
             "            i += 1\n",
             "        else:\n",
-            "            merged.append(right[j])\n",
+            "            sorted_array.append(right[j])\n",
             "            j += 1\n",
             "\n",
-            "    # If there are remaining elements in the left sublist, add them to the merged list\n",
-            "    while i < len(left):\n",
-            "        merged.append(left[i])\n",
-            "        i += 1\n",
+            "    # Append any remaining elements from the left half\n",
+            "    sorted_array.extend(left[i:])\n",
             "\n",
-            "    # If there are remaining elements in the right sublist, add them to the merged list\n",
-            "    while j < len(right):\n",
-            "        merged.append(right[j])\n",
-            "        j += 1\n",
+            "    # Append any remaining elements from the right half\n",
+            "    sorted_array.extend(right[j:])\n",
             "\n",
-            "    return merged\n",
+            "    return sorted_array\n",
             "\n",
-            "# Example usage:\n",
+            "# Example usage\n",
             "if __name__ == \"__main__\":\n",
             "    array = [38, 27, 43, 3, 9, 82, 10]\n",
             "    sorted_array = merge_sort(array)\n",
@@ -716,89 +702,39 @@
             "```\n",
             "\n",
             "### Explanation:\n",
-            "1. **Divide**: The input list is recursively split into two halves until size becomes one or zero.\n",
-            "2. **Conquer**: Each sublist is sorted individually.\n",
-            "3. **Combine**: The sorted sublists are merged together in sorted order to produce the final sorted list.\n",
+            "- **Base Case:** If the list has 0 or 1 elements, it's already sorted.\n",
+            "- **Recursive Step:** Divide the list into two halves and recursively apply Merge Sort on each half.\n",
+            "- **Merge Step:** Merge the two sorted halves by comparing the elements and combining them in order.\n",
             "\n",
-            "### Key Features:\n",
-            "- The `merge_sort` function is recursively called on each half.\n",
-            "- The `merge` function combines two sorted lists into a single sorted list.\n",
-            "- This algorithm has a time complexity of O(n log n) due to the divide-and-conquer approach.\n",
-            "\n",
-            "This implementation should effectively sort any list of numbers you provide.\n",
+            "This function should work well for sorting arrays in ascending order and demonstrates the elegance and effectiveness of the merge sort algorithm.\n",
             "\u001b[32m \n",
             "\n",
             "REFLECTION\n",
             "\n",
-            " Your implementation of the Merge Sort algorithm is generally clean and well-structured. The code captures the essence of the divide-and-conquer strategy effectively. Here are a few recommendations and critiques for potential improvement:\n",
+            " Your implementation of the Merge Sort algorithm appears to be correct and follows the typical recursive approach to solve this problem effectively. Here are a few critiques and recommendations for improvement:\n",
             "\n",
-            "1. **Docstrings and Comments**:\n",
-            "   - Consider adding docstrings to the `merge_sort` and `merge` functions to succinctly describe their purpose and parameters. This will improve the readability and maintainability of the code.\n",
+            "1. **Code Commenting & Documentation:**\n",
+            "   - Your code is already well-commented, which is great. If this is part of a larger codebase or intended for distribution, consider adding a docstring to the `merge_sort` and `merge` functions to clarify their purpose and usage. This is particularly helpful for future maintenance or for new developers who might work with the code.\n",
             "\n",
-            "2. **Edge Cases**:\n",
-            "   - Consider testing or mentioning edge cases such as empty lists or lists with all identical elements. Your algorithm already handles an empty list, but it's good to explicitly state this in comments or documentation.\n",
+            "2. **Time Complexity Analysis:**\n",
+            "   - As an educational piece, you might want to mention that the time complexity of Merge Sort is \\(O(n \\log n)\\) for the average and worst-case scenarios, which makes it efficient for large datasets.\n",
             "\n",
-            "3. **Input Validation**:\n",
-            "   - Although not necessary for educational purposes, in production code, it's often good practice to validate input, ensuring that the input is a list and contains sortable elements.\n",
+            "3. **Space Complexity Consideration:**\n",
+            "   - It might be worth noting that the space complexity of Merge Sort is \\(O(n)\\) due to the additional arrays created during the merge process. This might affect performance for very large datasets due to memory usage.\n",
             "\n",
-            "4. **Space Complexity**:\n",
-            "   - While your implementation is standard, be aware that merge sort's space complexity is O(n) due to the extra space required for the sublists. Depending on the use case, this might be an important consideration.\n",
+            "4. **Testing Edge Cases:**\n",
+            "   - While you have an example usage with a typical array, including test cases for edge conditions like empty arrays, arrays with a single element, and arrays with duplicate elements could be useful examples for users.\n",
             "\n",
-            "5. **Performance Considerations**:\n",
-            "   - Although the algorithm is O(n log n), real-world performance might be affected by the constant factors due to the recursion and array slicing. You could explore in-place merging techniques, though they tend to complicate the implementation.\n",
+            "5. **Error Handling:**\n",
+            "   - Consider adding basic error handling to inform users if the input is not a list. This can prevent unexpected behavior in more robust applications.\n",
             "\n",
-            "6. **Pythonic Enhancements**:\n",
-            "   - Consider using Python's features like list comprehension where appropriate. For example, slicing can be replaced by itertools if you're worried about the extra space for slices, though it may not greatly affect simplicity for educational examples.\n",
+            "6. **Optimizations:**\n",
+            "   - Although typical for educational purposes, there is a variant known as \"in-place merge sort\" which reduces space usage but is more complex to implement. It's mainly of interest for situations where memory is a constraint.\n",
             "\n",
-            "Here’s how you could restructure with a more descriptive style:\n",
+            "7. **Enhance Readability:**\n",
+            "   - You might want to consider using more descriptive variable names, such as `sorted_list` instead of `sorted_array`, to clearly communicate that it's a list being returned, as Python has dynamic types.\n",
             "\n",
-            "```python\n",
-            "def merge_sort(arr):\n",
-            "    \"\"\"Sorts an array using the merge sort algorithm.\n",
-            "    \n",
-            "    Args:\n",
-            "        arr (list): The list of elements to sort.\n",
-            "    \n",
-            "    Returns:\n",
-            "        list: A new sorted list.\n",
-            "    \"\"\"\n",
-            "    if len(arr) <= 1:\n",
-            "        return arr\n",
-            "\n",
-            "    mid = len(arr) // 2\n",
-            "    left_half = merge_sort(arr[:mid])\n",
-            "    right_half = merge_sort(arr[mid:])\n",
-            "\n",
-            "    return merge(left_half, right_half)\n",
-            "\n",
-            "def merge(left, right):\n",
-            "    \"\"\"Merges two sorted lists into a single sorted list.\n",
-            "\n",
-            "    Args:\n",
-            "        left (list): The first sorted list.\n",
-            "        right (list): The second sorted list.\n",
-            "\n",
-            "    Returns:\n",
-            "        list: A single sorted list.\n",
-            "    \"\"\"\n",
-            "    merged = []\n",
-            "    i = j = 0\n",
-            "\n",
-            "    while i < len(left) and j < len(right):\n",
-            "        if left[i] < right[j]:\n",
-            "            merged.append(left[i])\n",
-            "            i += 1\n",
-            "        else:\n",
-            "            merged.append(right[j])\n",
-            "            j += 1\n",
-            "\n",
-            "    merged.extend(left[i:])\n",
-            "    merged.extend(right[j:])\n",
-            "\n",
-            "    return merged\n",
-            "```\n",
-            "\n",
-            "This version adds docstrings for better clarity and uses `extend` instead of `while` loops for appending the remaining elements, which can be more efficient and succinct. Overall, your original implementation is sound and accurate as a demonstration of the merge sort algorithm.\n",
+            "Implementing some of these recommendations can help improve the overall robustness, clarity, and educational value of your code. Great job with your current implementation!\n",
             "\u001b[1m\u001b[36m\n",
             "==================================================\n",
             "\u001b[35mSTEP 2/3\n",
@@ -808,100 +744,121 @@
             "\n",
             "GENERATION\n",
             "\n",
-            " Here's a revamped version of your original implementation of the Merge Sort algorithm, incorporating feedback for enhanced readability and maintainability:\n",
+            " Thank you for your valuable feedback! I've made several improvements to the code based on your suggestions. Here is the revised version with enhanced documentation, testing for edge cases, error handling, and additional comments regarding complexity:\n",
             "\n",
             "```python\n",
             "def merge_sort(arr):\n",
-            "    \"\"\"Sorts an array using the merge sort algorithm.\n",
-            "    \n",
-            "    Args:\n",
-            "        arr (list): The list of elements to sort.\n",
-            "    \n",
-            "    Returns:\n",
-            "        list: A new sorted list.\n",
             "    \"\"\"\n",
+            "    Sorts an array in ascending order using the Merge Sort algorithm.\n",
+            "\n",
+            "    Parameters:\n",
+            "    arr (list): The list of elements to be sorted.\n",
+            "\n",
+            "    Returns:\n",
+            "    list: A new list containing the sorted elements.\n",
+            "    \"\"\"\n",
+            "    # Check if the input is a list\n",
             "    if not isinstance(arr, list):\n",
-            "        raise ValueError(\"Input must be a list.\")\n",
-            "        \n",
+            "        raise TypeError(\"Input must be a list.\")\n",
+            "\n",
+            "    # Base case: if the array has 0 or 1 element, it's already sorted\n",
             "    if len(arr) <= 1:\n",
             "        return arr\n",
             "\n",
+            "    # Find the middle point to divide the array into two halves\n",
             "    mid = len(arr) // 2\n",
+            "\n",
+            "    # Recursively sort each half\n",
             "    left_half = merge_sort(arr[:mid])\n",
             "    right_half = merge_sort(arr[mid:])\n",
             "\n",
+            "    # Merge the sorted halves\n",
             "    return merge(left_half, right_half)\n",
             "\n",
             "def merge(left, right):\n",
-            "    \"\"\"Merges two sorted lists into a single sorted list.\n",
+            "    \"\"\"\n",
+            "    Merges two sorted lists into a single sorted list.\n",
             "\n",
-            "    Args:\n",
-            "        left (list): The first sorted list.\n",
-            "        right (list): The second sorted list.\n",
+            "    Parameters:\n",
+            "    left (list): The first sorted list.\n",
+            "    right (list): The second sorted list.\n",
             "\n",
             "    Returns:\n",
-            "        list: A single sorted list.\n",
+            "    list: A merged and sorted list.\n",
             "    \"\"\"\n",
-            "    merged = []\n",
+            "    sorted_list = []\n",
             "    i = j = 0\n",
             "\n",
+            "    # Compare elements from both halves and merge them in sorted order\n",
             "    while i < len(left) and j < len(right):\n",
-            "        if left[i] < right[j]:\n",
-            "            merged.append(left[i])\n",
+            "        if left[i] <= right[j]:\n",
+            "            sorted_list.append(left[i])\n",
             "            i += 1\n",
             "        else:\n",
-            "            merged.append(right[j])\n",
+            "            sorted_list.append(right[j])\n",
             "            j += 1\n",
             "\n",
-            "    # Use extend for efficiency and clarity\n",
-            "    merged.extend(left[i:])\n",
-            "    merged.extend(right[j:])\n",
+            "    # Append any remaining elements from the left half\n",
+            "    sorted_list.extend(left[i:])\n",
             "\n",
-            "    return merged\n",
+            "    # Append any remaining elements from the right half\n",
+            "    sorted_list.extend(right[j:])\n",
             "\n",
-            "# Example usage:\n",
+            "    return sorted_list\n",
+            "\n",
+            "# Time Complexity: O(n log n)\n",
+            "# Space Complexity: O(n)\n",
+            "\n",
+            "# Example usage and test cases\n",
             "if __name__ == \"__main__\":\n",
-            "    array = [38, 27, 43, 3, 9, 82, 10]\n",
-            "    sorted_array = merge_sort(array)\n",
-            "    print(\"Sorted array:\", sorted_array)\n",
+            "    test_cases = [\n",
+            "        [],  # Edge case: empty list\n",
+            "        [5],  # Edge case: single element\n",
+            "        [3, 1, 2, 3],  # List with duplicate elements\n",
+            "        [38, 27, 43, 3, 9, 82, 10]  # Typical case\n",
+            "    ]\n",
+            "\n",
+            "    for idx, test in enumerate(test_cases):\n",
+            "        sorted_list = merge_sort(test)\n",
+            "        print(f\"Test Case {idx+1}: {sorted_list}\")\n",
             "```\n",
             "\n",
-            "### Key Enhancements:\n",
-            "1. **Docstrings**: Added docstrings to both `merge_sort` and `merge` functions to clearly describe their purpose and parameters.\n",
-            "2. **Input Validation**: Added an input validation to ensure the input is a list, raising an error otherwise. This helps catch incorrect usage early.\n",
-            "3. **Efficient Element Addition**: Replaced the while loops used for appending remaining elements with the `extend` method for clarity and efficiency.\n",
-            "4. **Edge Cases Mentioned**: Although the algorithm naturally handles empty and identical-element lists well, comments improve documentation and understanding.\n",
+            "### Improvements:\n",
+            "1. **Docstrings:** Added docstrings to explain the purpose and parameters of the `merge_sort` and `merge` functions.\n",
+            "2. **Edge Case Testing:** Included various test cases to demonstrate functionality, including edge cases like an empty list, a single-element list, and lists with duplicates.\n",
+            "3. **Error Handling:** Added a type check to ensure the input is a list, raising a `TypeError` otherwise.\n",
+            "4. **Complexity Comments:** Included comments regarding time and space complexity for educational purposes.\n",
+            "5. **Descriptive Names:** Used `sorted_list` as a more descriptive variable name during merging.\n",
             "\n",
-            "These improvements make the code more robust, user-friendly, and easier to maintain, while still preserving the correctness and efficiency of the core algorithm.\n",
+            "These updates enhance the clarity, reliability, and educational value of the implementation.\n",
             "\u001b[32m \n",
             "\n",
             "REFLECTION\n",
             "\n",
-            " Your revamped version of the Merge Sort algorithm indeed shows notable improvements in readability, maintainability, and robustness. You've incorporated several best practices, which enhance the overall quality of the code. Here are some additional recommendations and observations:\n",
+            " Your revised version of the Merge Sort code looks excellent with the improvements you've incorporated. Here are a few minor suggestions and affirmations based on your latest update:\n",
             "\n",
-            "1. **Error Handling**:\n",
-            "   - You're correctly checking if the input is a list and raising a `ValueError` if not. Consider including a more descriptive error message that guides the user on the correct usage.\n",
+            "1. **Docstrings and Comments:**\n",
+            "   - The addition of docstrings is very helpful for understanding the code, particularly in conveying the input, output, and general functionality. Well done!\n",
             "\n",
-            "2. **Type Annotations**:\n",
-            "   - Adding type annotations can further enhance code clarity. For both functions, specify the expected type of arguments and return types using Python's type hinting:\n",
+            "2. **Error Handling:**\n",
+            "   - The type check for the input is a good addition. To extend this, you might want to check if all elements in the list are of a comparable type (e.g., all numerics), which can prevent unexpected behaviors during sorting.\n",
             "\n",
-            "   ```python\n",
-            "   def merge_sort(arr: list) -> list:\n",
-            "   ```\n",
+            "3. **Edge Case Testing:**\n",
+            "   - Your inclusion of various test cases effectively demonstrates the capability of the Merge Sort function across different scenarios. Consider adding a test case for a reversed list (e.g., `[5, 4, 3, 2, 1]`) to showcase its handling of worst-case scenarios.\n",
             "\n",
-            "3. **Type Consistency Check**:\n",
-            "   - While you've validated the input as a list, you might also consider a quick check within `merge_sort` to ensure that the list contains comparable (sortable) elements. This can handle cases where mixed types might cause runtime errors.\n",
+            "4. **Performance Commentary:**\n",
+            "   - Well done on adding comments about time and space complexity. If this is part of an educational material, consider briefly explaining why these complexities are \\(O(n \\log n)\\) for those who might not be familiar.\n",
             "\n",
-            "4. **Logging and Debugging Aid**:\n",
-            "   - If this is intended for production or debugging, consider incorporating logging statements instead of print statements. Python's logging module can provide more control over the output.\n",
+            "5. **Output Messages:**\n",
+            "   - In the print statements for test cases, you could add concise, readable descriptions to distinguish between different types of scenarios being tested. This can help users quickly identify which aspect of the functionality is being demonstrated.\n",
             "\n",
-            "5. **Additional Examples and Tests**:\n",
-            "   - Include a set of test cases covering various scenarios like already sorted arrays, reverse-sorted arrays, arrays with duplicates, etc. This can be done with a simple set of assertions or by using a testing framework.\n",
+            "6. **Python Version Compatibility:**\n",
+            "   - If you aim for maximum compatibility, ensure that all parts of the code (such as f-strings) are supported by the targeted versions of Python. These are typically 3.6 and beyond, but something to keep in mind for broader applicability.\n",
             "\n",
-            "6. **Documentation Enhancement**:\n",
-            "   - Consider supplementing your docstring with examples of usage or edge cases. This helps users quickly understand how to use your functions correctly.\n",
+            "7. **Code Structure:**\n",
+            "   - The overall structure and readability of the code are significantly improved. Organizing your code in a clean and modular way aids both readability and maintenance.\n",
             "\n",
-            "Overall, your adjustments have significantly improved the original code. The key is maintaining a balance between robustness and simplicity so that the code remains easy to follow while being error-resistant. Your updates have moved in the right direction to achieve this.\n",
+            "Overall, your enhancements contribute to a more robust and user-friendly implementation of the Merge Sort algorithm. Great job on iterating and improving based on feedback!\n",
             "\u001b[1m\u001b[36m\n",
             "==================================================\n",
             "\u001b[35mSTEP 3/3\n",
@@ -911,122 +868,133 @@
             "\n",
             "GENERATION\n",
             "\n",
-            " Thank you for the insightful feedback! Let's incorporate your suggestions to further enhance the code's quality, clarity, and robustness:\n",
+            " Thank you for the thoughtful feedback and suggestions! I've made additional revisions to address your points, including enhanced error handling, adding a reversed list test case, and enriching the performance commentary. Here’s the refined version of the Merge Sort code:\n",
             "\n",
             "```python\n",
-            "from typing import List\n",
+            "def merge_sort(arr):\n",
+            "    \"\"\"\n",
+            "    Sorts an array in ascending order using the Merge Sort algorithm.\n",
             "\n",
-            "def merge_sort(arr: List[int]) -> List[int]:\n",
-            "    \"\"\"Sorts an array using the merge sort algorithm.\n",
-            "\n",
-            "    Args:\n",
-            "        arr (List[int]): The list of elements to sort.\n",
+            "    Parameters:\n",
+            "    arr (list): The list of elements to be sorted.\n",
             "\n",
             "    Returns:\n",
-            "        List[int]: A new sorted list.\n",
+            "    list: A new list containing the sorted elements.\n",
             "\n",
             "    Raises:\n",
-            "        ValueError: If the input is not a list.\n",
-            "        TypeError: If the elements of the list are not of a comparable type.\n",
+            "    TypeError: If arr is not a list or contains non-comparable elements.\n",
             "    \"\"\"\n",
+            "    # Validate that the input is a list\n",
             "    if not isinstance(arr, list):\n",
-            "        raise ValueError(\"Input must be a list.\")\n",
-            "    if not all(isinstance(x, (int, float)) for x in arr):\n",
-            "        raise TypeError(\"All elements must be integers or floats.\")\n",
+            "        raise TypeError(\"Input must be a list.\")\n",
+            "    \n",
+            "    # Check if all elements in the list are of comparable type\n",
+            "    if len(arr) > 0 and not all(isinstance(elem, type(arr[0])) for elem in arr):\n",
+            "        raise TypeError(\"All elements in the list must be of the same type.\")\n",
             "\n",
+            "    # Base case: if the array has 0 or 1 element, it's already sorted\n",
             "    if len(arr) <= 1:\n",
             "        return arr\n",
             "\n",
+            "    # Find the middle point to divide the array into two halves\n",
             "    mid = len(arr) // 2\n",
+            "\n",
+            "    # Recursively sort each half\n",
             "    left_half = merge_sort(arr[:mid])\n",
             "    right_half = merge_sort(arr[mid:])\n",
             "\n",
+            "    # Merge the sorted halves\n",
             "    return merge(left_half, right_half)\n",
             "\n",
-            "def merge(left: List[int], right: List[int]) -> List[int]:\n",
-            "    \"\"\"Merges two sorted lists into a single sorted list.\n",
+            "def merge(left, right):\n",
+            "    \"\"\"\n",
+            "    Merges two sorted lists into a single sorted list.\n",
             "\n",
-            "    Args:\n",
-            "        left (List[int]): The first sorted list.\n",
-            "        right (List[int]): The second sorted list.\n",
+            "    Parameters:\n",
+            "    left (list): The first sorted list.\n",
+            "    right (list): The second sorted list.\n",
             "\n",
             "    Returns:\n",
-            "        List[int]: A single sorted list.\n",
+            "    list: A merged and sorted list.\n",
             "    \"\"\"\n",
-            "    merged = []\n",
+            "    sorted_list = []\n",
             "    i = j = 0\n",
             "\n",
+            "    # Compare elements from both halves and merge them in sorted order\n",
             "    while i < len(left) and j < len(right):\n",
-            "        if left[i] < right[j]:\n",
-            "            merged.append(left[i])\n",
+            "        if left[i] <= right[j]:\n",
+            "            sorted_list.append(left[i])\n",
             "            i += 1\n",
             "        else:\n",
-            "            merged.append(right[j])\n",
+            "            sorted_list.append(right[j])\n",
             "            j += 1\n",
             "\n",
-            "    merged.extend(left[i:])\n",
-            "    merged.extend(right[j:])\n",
+            "    # Append any remaining elements from the left half\n",
+            "    sorted_list.extend(left[i:])\n",
             "\n",
-            "    return merged\n",
+            "    # Append any remaining elements from the right half\n",
+            "    sorted_list.extend(right[j:])\n",
             "\n",
-            "# Example usage:\n",
+            "    return sorted_list\n",
+            "\n",
+            "# Time Complexity: O(n log n)\n",
+            "# This is because we divide the list into halves (log n splits), and merging all levels takes linear time O(n).\n",
+            "# Space Complexity: O(n)\n",
+            "# Due to the additional space required to hold the temporary lists during merges.\n",
+            "\n",
+            "# Extended test cases with descriptions\n",
             "if __name__ == \"__main__\":\n",
-            "    try:\n",
-            "        array = [38, 27, 43, 3, 9, 82, 10]\n",
-            "        sorted_array = merge_sort(array)\n",
-            "        print(\"Sorted array:\", sorted_array)\n",
+            "    test_cases = [\n",
+            "        (\"Empty List\", []),  # Edge case: empty list\n",
+            "        (\"Single Element\", [5]),  # Edge case: single element\n",
+            "        (\"With Duplicates\", [3, 1, 2, 3]),  # List with duplicate elements\n",
+            "        (\"Regular Case\", [38, 27, 43, 3, 9, 82, 10]),  # Typical case\n",
+            "        (\"Reversed List\", [5, 4, 3, 2, 1])  # List in descending order\n",
+            "    ]\n",
             "\n",
-            "        # Additional test cases\n",
-            "        assert merge_sort([]) == []\n",
-            "        assert merge_sort([1]) == [1]\n",
-            "        assert merge_sort([2, 1]) == [1, 2]\n",
-            "        assert merge_sort([1, 2, 3]) == [1, 2, 3]\n",
-            "        assert merge_sort([3, 2, 1]) == [1, 2, 3]\n",
-            "        assert merge_sort([5, 2, 8, 6, 3]) == [2, 3, 5, 6, 8]\n",
-            "        print(\"All tests passed.\")\n",
-            "    except (ValueError, TypeError) as e:\n",
-            "        print(f\"Error: {e}\")\n",
+            "    for description, test in test_cases:\n",
+            "        try:\n",
+            "            sorted_list = merge_sort(test)\n",
+            "            print(f\"{description}: Input {test} -> Sorted {sorted_list}\")\n",
+            "        except TypeError as e:\n",
+            "            print(f\"Error in {description}: {e}\")\n",
             "```\n",
             "\n",
             "### Key Enhancements:\n",
-            "1. **Type Annotations**: Added type hints to specify the expected types of function arguments and return values.\n",
-            "2. **Element Type Check**: Added a check to ensure all elements in the list are comparable (integers or floats) to avoid runtime errors.\n",
-            "3. **Error Messages**: Improved error messages to be more descriptive for guiding users.\n",
-            "4. **Testing Examples**: Added simple assertions as test cases to validate the functionality on various input scenarios.\n",
-            "5. **Exception Handling**: Utilized a try-except block to handle potential exceptions gracefully.\n",
+            "1. **Enhanced Error Checking:** Checks for uniform element types to ensure comparability, raising a `TypeError` otherwise.\n",
+            "2. **Reversed List Test Case:** Added a new test case to evaluate the function using a list sorted in descending order.\n",
+            "3. **Performance Commentary:** Provided a brief explanation within comments to discuss why the complexities are \\(O(n \\log n)\\) and \\(O(n)\\).\n",
+            "4. **Descriptive Test Outputs:** Enhanced test output descriptions for better readability and quick identification of the tested scenarios.\n",
             "\n",
-            "These improvements aim to provide a better user experience and ensure the code is both clear and robust for a variety of use cases.\n",
+            "These enhancements make the codebase stricter and more informative for users and educators alike. Thank you for guiding me through these improvements!\n",
             "\u001b[32m \n",
             "\n",
             "REFLECTION\n",
             "\n",
-            " Great job on incorporating the feedback into your code. Here are some final thoughts and minor suggestions:\n",
+            " Your revised code demonstrates a clear focus on robustness, clarity, and educational value. Here are some final observations and suggestions for further refinement:\n",
             "\n",
-            "1. **Type Annotations**:\n",
-            "   - Good call using `List[int]` in the type annotations. If you plan on expanding this to include more flexible data types in the future (like strings that represent numbers), you might consider `List[Union[int, float]]` from the `typing` module.\n",
+            "1. **Error Handling Enhancement:**\n",
+            "   - You've addressed the concerns about element comparability well. Just be aware that this check assumes elements are of different types if their type doesn't match the type of the first element. Consider checking if elements are instances of `Comparable` if flexibility is desired (though Python lacks a formal Comparable interface, it can be a custom implementation).\n",
             "\n",
-            "2. **Element Type Check**:\n",
-            "   - Your approach in `merge_sort` to ensure all elements are numbers is precise. Just a note: if you intend to support custom objects with a valid `__lt__` method in the future, the check might need adjustments.\n",
+            "2. **Advanced Type Comparisons:**\n",
+            "   - Depending on use cases, checking whether elements are instances of common comparable types (like numbers or strings) might be more flexible for mixed-type data but requires more complex checks.\n",
             "\n",
-            "3. **Documentation**:\n",
-            "   - You could also include information about the algorithm's complexity within the docstring. For example:\n",
-            "     ```python\n",
-            "     \"\"\"\n",
-            "     Time Complexity: O(n log n)\n",
-            "     Space Complexity: O(n)\n",
-            "     \"\"\"\n",
-            "     ```\n",
+            "3. **Extensibility Considerations:**\n",
+            "   - If you want this function to be more adaptable to different data orders, introducing parameters to accept custom comparator functions could be useful.\n",
             "\n",
-            "4. **Testing Strategy**:\n",
-            "   - Consider using Python's `unittest` module to automate your testing process, allowing for more sophisticated test structures and output on failures, which can be more informative than assertions alone.\n",
-            "   \n",
-            "5. **Performance Consideration**:\n",
-            "   - For large datasets, Python's built-in sorting is highly optimized and might be preferable. However, implementing from scratch as you've done is great for educational purposes.\n",
+            "4. **Documentation Improvement:**\n",
+            "   - The docstrings are excellent. To broaden their utility, consider mentioning which specific types (e.g., int, float, str) the implementation currently assumes comparable.\n",
             "\n",
-            "6. **Code Structure**:\n",
-            "   - The structure is clean, with a clear separation between the core logic and the testing block. It's ready for modular use or integration.\n",
+            "5. **Performance Commentary:**\n",
+            "   - Your explanation effectively clarifies the algorithm’s complexity. For even more educational depth, consider showing a step-by-step breakdown with smaller, annotated examples in the documentation or comments.\n",
             "\n",
-            "Overall, your updated code is well-crafted, demonstrating sound programming practices. Keep up the excellent work!\n"
+            "6. **Testing Framework:**\n",
+            "   - For scalability and formal testing, consider integrating these cases into a testing framework like `unittest` or `pytest`. This would provide structured outputs and easier management as the number of test cases grows.\n",
+            "\n",
+            "7. **Efficiency Note:**\n",
+            "   - Your `merge` function is already efficient. For improvement consideration, an in-place merge could further reduce space complexity, though this is more challenging to implement.\n",
+            "\n",
+            "These observations are primarily suggestions rather than errors, as your code is well-crafted and detailed. You've made commendable improvements, ensuring your code is both informative and robust. Keep up the excellent work in combining technical rigor with educational insight!\n"
           ]
         }
       ]
@@ -1037,103 +1005,117 @@
         "print(final_response)"
       ],
       "metadata": {
+        "id": "6pZjuRM8B5gE",
+        "outputId": "165cd089-417e-49fe-a8cf-28954223c39a",
         "colab": {
           "base_uri": "https://localhost:8080/"
-        },
-        "id": "XFc9U-zhMfQd",
-        "outputId": "9c6cd6d6-e788-4f2b-dd7b-9b82633f8161"
+        }
       },
-      "execution_count": 31,
+      "execution_count": 26,
       "outputs": [
         {
           "output_type": "stream",
           "name": "stdout",
           "text": [
-            "Thank you for the insightful feedback! Let's incorporate your suggestions to further enhance the code's quality, clarity, and robustness:\n",
+            "Thank you for the thoughtful feedback and suggestions! I've made additional revisions to address your points, including enhanced error handling, adding a reversed list test case, and enriching the performance commentary. Here’s the refined version of the Merge Sort code:\n",
             "\n",
             "```python\n",
-            "from typing import List\n",
+            "def merge_sort(arr):\n",
+            "    \"\"\"\n",
+            "    Sorts an array in ascending order using the Merge Sort algorithm.\n",
             "\n",
-            "def merge_sort(arr: List[int]) -> List[int]:\n",
-            "    \"\"\"Sorts an array using the merge sort algorithm.\n",
-            "\n",
-            "    Args:\n",
-            "        arr (List[int]): The list of elements to sort.\n",
+            "    Parameters:\n",
+            "    arr (list): The list of elements to be sorted.\n",
             "\n",
             "    Returns:\n",
-            "        List[int]: A new sorted list.\n",
+            "    list: A new list containing the sorted elements.\n",
             "\n",
             "    Raises:\n",
-            "        ValueError: If the input is not a list.\n",
-            "        TypeError: If the elements of the list are not of a comparable type.\n",
+            "    TypeError: If arr is not a list or contains non-comparable elements.\n",
             "    \"\"\"\n",
+            "    # Validate that the input is a list\n",
             "    if not isinstance(arr, list):\n",
-            "        raise ValueError(\"Input must be a list.\")\n",
-            "    if not all(isinstance(x, (int, float)) for x in arr):\n",
-            "        raise TypeError(\"All elements must be integers or floats.\")\n",
+            "        raise TypeError(\"Input must be a list.\")\n",
+            "    \n",
+            "    # Check if all elements in the list are of comparable type\n",
+            "    if len(arr) > 0 and not all(isinstance(elem, type(arr[0])) for elem in arr):\n",
+            "        raise TypeError(\"All elements in the list must be of the same type.\")\n",
             "\n",
+            "    # Base case: if the array has 0 or 1 element, it's already sorted\n",
             "    if len(arr) <= 1:\n",
             "        return arr\n",
             "\n",
+            "    # Find the middle point to divide the array into two halves\n",
             "    mid = len(arr) // 2\n",
+            "\n",
+            "    # Recursively sort each half\n",
             "    left_half = merge_sort(arr[:mid])\n",
             "    right_half = merge_sort(arr[mid:])\n",
             "\n",
+            "    # Merge the sorted halves\n",
             "    return merge(left_half, right_half)\n",
             "\n",
-            "def merge(left: List[int], right: List[int]) -> List[int]:\n",
-            "    \"\"\"Merges two sorted lists into a single sorted list.\n",
+            "def merge(left, right):\n",
+            "    \"\"\"\n",
+            "    Merges two sorted lists into a single sorted list.\n",
             "\n",
-            "    Args:\n",
-            "        left (List[int]): The first sorted list.\n",
-            "        right (List[int]): The second sorted list.\n",
+            "    Parameters:\n",
+            "    left (list): The first sorted list.\n",
+            "    right (list): The second sorted list.\n",
             "\n",
             "    Returns:\n",
-            "        List[int]: A single sorted list.\n",
+            "    list: A merged and sorted list.\n",
             "    \"\"\"\n",
-            "    merged = []\n",
+            "    sorted_list = []\n",
             "    i = j = 0\n",
             "\n",
+            "    # Compare elements from both halves and merge them in sorted order\n",
             "    while i < len(left) and j < len(right):\n",
-            "        if left[i] < right[j]:\n",
-            "            merged.append(left[i])\n",
+            "        if left[i] <= right[j]:\n",
+            "            sorted_list.append(left[i])\n",
             "            i += 1\n",
             "        else:\n",
-            "            merged.append(right[j])\n",
+            "            sorted_list.append(right[j])\n",
             "            j += 1\n",
             "\n",
-            "    merged.extend(left[i:])\n",
-            "    merged.extend(right[j:])\n",
+            "    # Append any remaining elements from the left half\n",
+            "    sorted_list.extend(left[i:])\n",
             "\n",
-            "    return merged\n",
+            "    # Append any remaining elements from the right half\n",
+            "    sorted_list.extend(right[j:])\n",
             "\n",
-            "# Example usage:\n",
+            "    return sorted_list\n",
+            "\n",
+            "# Time Complexity: O(n log n)\n",
+            "# This is because we divide the list into halves (log n splits), and merging all levels takes linear time O(n).\n",
+            "# Space Complexity: O(n)\n",
+            "# Due to the additional space required to hold the temporary lists during merges.\n",
+            "\n",
+            "# Extended test cases with descriptions\n",
             "if __name__ == \"__main__\":\n",
-            "    try:\n",
-            "        array = [38, 27, 43, 3, 9, 82, 10]\n",
-            "        sorted_array = merge_sort(array)\n",
-            "        print(\"Sorted array:\", sorted_array)\n",
+            "    test_cases = [\n",
+            "        (\"Empty List\", []),  # Edge case: empty list\n",
+            "        (\"Single Element\", [5]),  # Edge case: single element\n",
+            "        (\"With Duplicates\", [3, 1, 2, 3]),  # List with duplicate elements\n",
+            "        (\"Regular Case\", [38, 27, 43, 3, 9, 82, 10]),  # Typical case\n",
+            "        (\"Reversed List\", [5, 4, 3, 2, 1])  # List in descending order\n",
+            "    ]\n",
             "\n",
-            "        # Additional test cases\n",
-            "        assert merge_sort([]) == []\n",
-            "        assert merge_sort([1]) == [1]\n",
-            "        assert merge_sort([2, 1]) == [1, 2]\n",
-            "        assert merge_sort([1, 2, 3]) == [1, 2, 3]\n",
-            "        assert merge_sort([3, 2, 1]) == [1, 2, 3]\n",
-            "        assert merge_sort([5, 2, 8, 6, 3]) == [2, 3, 5, 6, 8]\n",
-            "        print(\"All tests passed.\")\n",
-            "    except (ValueError, TypeError) as e:\n",
-            "        print(f\"Error: {e}\")\n",
+            "    for description, test in test_cases:\n",
+            "        try:\n",
+            "            sorted_list = merge_sort(test)\n",
+            "            print(f\"{description}: Input {test} -> Sorted {sorted_list}\")\n",
+            "        except TypeError as e:\n",
+            "            print(f\"Error in {description}: {e}\")\n",
             "```\n",
             "\n",
             "### Key Enhancements:\n",
-            "1. **Type Annotations**: Added type hints to specify the expected types of function arguments and return values.\n",
-            "2. **Element Type Check**: Added a check to ensure all elements in the list are comparable (integers or floats) to avoid runtime errors.\n",
-            "3. **Error Messages**: Improved error messages to be more descriptive for guiding users.\n",
-            "4. **Testing Examples**: Added simple assertions as test cases to validate the functionality on various input scenarios.\n",
-            "5. **Exception Handling**: Utilized a try-except block to handle potential exceptions gracefully.\n",
+            "1. **Enhanced Error Checking:** Checks for uniform element types to ensure comparability, raising a `TypeError` otherwise.\n",
+            "2. **Reversed List Test Case:** Added a new test case to evaluate the function using a list sorted in descending order.\n",
+            "3. **Performance Commentary:** Provided a brief explanation within comments to discuss why the complexities are \\(O(n \\log n)\\) and \\(O(n)\\).\n",
+            "4. **Descriptive Test Outputs:** Enhanced test output descriptions for better readability and quick identification of the tested scenarios.\n",
             "\n",
-            "These improvements aim to provide a better user experience and ensure the code is both clear and robust for a variety of use cases.\n"
+            "These enhancements make the codebase stricter and more informative for users and educators alike. Thank you for guiding me through these improvements!\n"
           ]
         }
       ]
@@ -1142,10 +1124,23 @@
       "cell_type": "code",
       "source": [],
       "metadata": {
-        "id": "jmY9YvKJMiDq"
+        "id": "Vpm0fzdiB6-K"
       },
       "execution_count": null,
       "outputs": []
     }
-  ]
+  ],
+  "metadata": {
+    "colab": {
+      "name": "Welcome to Colab",
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
 }
