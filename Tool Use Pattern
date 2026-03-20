@@ -1,0 +1,1049 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPJkW8oqBfOFgeeEsSBCVMF",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/rahul02500/Practicepython/blob/main/Tool%20Use%20Pattern\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "qUDyrNiXFtWV",
+        "outputId": "6baac30a-6792-4014-a085-dff6e7fedac6"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: openai in /usr/local/lib/python3.12/dist-packages (2.28.0)\n",
+            "Collecting colorama\n",
+            "  Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)\n",
+            "Requirement already satisfied: anyio<5,>=3.5.0 in /usr/local/lib/python3.12/dist-packages (from openai) (4.12.1)\n",
+            "Requirement already satisfied: distro<2,>=1.7.0 in /usr/local/lib/python3.12/dist-packages (from openai) (1.9.0)\n",
+            "Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from openai) (0.28.1)\n",
+            "Requirement already satisfied: jiter<1,>=0.10.0 in /usr/local/lib/python3.12/dist-packages (from openai) (0.13.0)\n",
+            "Requirement already satisfied: pydantic<3,>=1.9.0 in /usr/local/lib/python3.12/dist-packages (from openai) (2.12.3)\n",
+            "Requirement already satisfied: sniffio in /usr/local/lib/python3.12/dist-packages (from openai) (1.3.1)\n",
+            "Requirement already satisfied: tqdm>4 in /usr/local/lib/python3.12/dist-packages (from openai) (4.67.3)\n",
+            "Requirement already satisfied: typing-extensions<5,>=4.11 in /usr/local/lib/python3.12/dist-packages (from openai) (4.15.0)\n",
+            "Requirement already satisfied: idna>=2.8 in /usr/local/lib/python3.12/dist-packages (from anyio<5,>=3.5.0->openai) (3.11)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->openai) (2026.2.25)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.23.0->openai) (1.0.9)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->openai) (0.16.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3,>=1.9.0->openai) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3,>=1.9.0->openai) (2.41.4)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from pydantic<3,>=1.9.0->openai) (0.4.2)\n",
+            "Downloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)\n",
+            "Installing collected packages: colorama\n",
+            "Successfully installed colorama-0.4.6\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install openai colorama"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import json\n",
+        "\n",
+        "def get_current_weather(location: str, unit: str):\n",
+        "\t\"\"\"\n",
+        "\tGet the current weather in a given location\n",
+        "\n",
+        "\tlocation (str): The city and state, e.g. Madrid, Barcelona\n",
+        "\tunit (str): The unit. It can take two values; \"celsius\", \"fahrenheit\"\n",
+        "\t\"\"\"\n",
+        "\tif location == \"Madrid\":\n",
+        "\t\treturn json.dumps({\"temperature\": 25, \"unit\": unit})\n",
+        "\n",
+        "\telse:\n",
+        "\t\treturn json.dumps({\"temperature\": 58, \"unit\": unit})"
+      ],
+      "metadata": {
+        "id": "PrIA7vYjF1lf"
+      },
+      "execution_count": 2,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "get_current_weather(location=\"Madrid\", unit=\"celsius\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 35
+        },
+        "id": "2w7yiKjGGBnI",
+        "outputId": "8e25900e-f892-4888-82c4-05ab8017aef0"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "'{\"temperature\": 25, \"unit\": \"celsius\"}'"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 3
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import os\n",
+        "import re\n",
+        "from google.colab import userdata\n",
+        "\n",
+        "from openai import OpenAI\n",
+        "\n",
+        "# Remember to add your OpenAI API Key to the user data\n",
+        "client = OpenAI(\n",
+        "    api_key=userdata.get('OPENAI_API_KEY')\n",
+        ")\n",
+        "model = \"gpt-4o\"\n",
+        "\n",
+        "# Define the System Prompt as a constant\n",
+        "TOOL_SYSTEM_PROMPT = \"\"\"\n",
+        "You are a function calling AI model. You are provided with function signatures within <tools></tools> XML tags.\n",
+        "You may call one or more functions to assist with the user query. Don't make assumptions about what values to plug\n",
+        "into functions. Pay special attention to the properties 'types'. You should use those types as in a Python dict.\n",
+        "For each function call return a json object with function name and arguments within <tool_call></tool_call> XML tags as follows:\n",
+        "\n",
+        "<tool_call>\n",
+        "{\"name\": <function-name>,\"arguments\": <args-dict>}\n",
+        "</tool_call>\n",
+        "\n",
+        "Here are the available tools:\n",
+        "\n",
+        "<tools> {\n",
+        "    \"name\": \"get_current_weather\",\n",
+        "    \"description\": \"Get the current weather in a given location location (str): The city and state, e.g. Madrid, Barcelona unit (str): The unit. It can take two values; 'celsius', 'fahrenheit'\",\n",
+        "    \"parameters\": {\n",
+        "        \"properties\": {\n",
+        "            \"location\": {\n",
+        "                \"type\": \"str\"\n",
+        "            },\n",
+        "            \"unit\": {\n",
+        "                \"type\": \"str\"\n",
+        "            }\n",
+        "        }\n",
+        "    }\n",
+        "}\n",
+        "</tools>\n",
+        "\"\"\""
+      ],
+      "metadata": {
+        "id": "UXEvgW2JMJqu"
+      },
+      "execution_count": 10,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "tool_chat_history = [\n",
+        "    {\n",
+        "        \"role\": \"system\",\n",
+        "        \"content\": TOOL_SYSTEM_PROMPT\n",
+        "    }\n",
+        "]\n",
+        "agent_chat_history = []\n",
+        "\n",
+        "user_msg = {\n",
+        "    \"role\": \"user\",\n",
+        "    \"content\": \"What's the current temperature in Madrid, in Celsius?\"\n",
+        "}\n",
+        "\n",
+        "tool_chat_history.append(user_msg)\n",
+        "agent_chat_history.append(user_msg)\n",
+        "\n",
+        "output = client.chat.completions.create(\n",
+        "    messages=tool_chat_history,\n",
+        "    model=model\n",
+        ").choices[0].message.content\n",
+        "\n",
+        "print(output)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "bGa2gyImMLKk",
+        "outputId": "c1163922-8413-41a2-d12d-44d752e7c8b1"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "To get the current temperature in Madrid, in Celsius, I will call the relevant function.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def parse_tool_call_str(tool_call_str: str):\n",
+        "    match = re.search(r'<tool_call>(.*?)</tool_call>', tool_call_str, re.DOTALL)\n",
+        "    if match:\n",
+        "      content = match.group(1).strip()\n",
+        "      try:\n",
+        "        return json.loads(content)\n",
+        "      except json.JSONDecodeError:\n",
+        "        raise ValueError(\"Content inside <tool_call> is not valid JSON.\")\n",
+        "    else:\n",
+        "        raise ValueError(\"No <tool_call> tags found in the text.\")"
+      ],
+      "metadata": {
+        "id": "dDqpCTyCMRmS"
+      },
+      "execution_count": 12,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "output = '<tool_call>{\"name\": \"get_current_weather\",\"arguments\": {\"location\": \"Madrid\", \"unit\": \"celsius\"}}</tool_call>'\n",
+        "parsed_output = parse_tool_call_str(output)\n",
+        "parsed_output"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xncwgcVHMTu_",
+        "outputId": "7dd6b9c7-5959-4c46-dad1-1f25237bcd35"
+      },
+      "execution_count": 14,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "{'name': 'get_current_weather',\n",
+              " 'arguments': {'location': 'Madrid', 'unit': 'celsius'}}"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 14
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "result = get_current_weather(**parsed_output[\"arguments\"])"
+      ],
+      "metadata": {
+        "id": "uPCQtckQMfPK"
+      },
+      "execution_count": 15,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "result"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 35
+        },
+        "id": "aFGKnbZoM-jx",
+        "outputId": "68615bfa-2969-4ef9-f106-82d44ccda8b8"
+      },
+      "execution_count": 16,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "'{\"temperature\": 25, \"unit\": \"celsius\"}'"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "agent_chat_history.append({\n",
+        "    \"role\": \"user\",\n",
+        "    \"content\": f\"Observation: {result}\"\n",
+        "})"
+      ],
+      "metadata": {
+        "id": "6SVwASTfNAhw"
+      },
+      "execution_count": 17,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "client.chat.completions.create(\n",
+        "    messages=agent_chat_history,\n",
+        "    model=model\n",
+        ").choices[0].message.content"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 35
+        },
+        "id": "m8dXHzkINY2X",
+        "outputId": "f0cf549c-8710-43c4-a96d-19dcef8ad1ec"
+      },
+      "execution_count": 18,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "'The current temperature in Madrid is 25°C.'"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 18
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import json\n",
+        "from typing import Callable\n",
+        "\n",
+        "\n",
+        "def get_fn_signature(fn: Callable) -> dict:\n",
+        "    \"\"\"\n",
+        "    Generates the signature for a given function.\n",
+        "\n",
+        "    Args:\n",
+        "        fn (Callable): The function whose signature needs to be extracted.\n",
+        "\n",
+        "    Returns:\n",
+        "        dict: A dictionary containing the function's name, description,\n",
+        "              and parameter types.\n",
+        "    \"\"\"\n",
+        "    fn_signature: dict = {\n",
+        "        \"name\": fn.__name__,\n",
+        "        \"description\": fn.__doc__,\n",
+        "        \"parameters\": {\"properties\": {}},\n",
+        "    }\n",
+        "    schema = {\n",
+        "        k: {\"type\": v.__name__} for k, v in fn.__annotations__.items() if k != \"return\"\n",
+        "    }\n",
+        "    fn_signature[\"parameters\"][\"properties\"] = schema\n",
+        "    return fn_signature\n",
+        "\n",
+        "\n",
+        "def validate_arguments(tool_call: dict, tool_signature: dict) -> dict:\n",
+        "    \"\"\"\n",
+        "    Validates and converts arguments in the input dictionary to match the expected types.\n",
+        "\n",
+        "    Args:\n",
+        "        tool_call (dict): A dictionary containing the arguments passed to the tool.\n",
+        "        tool_signature (dict): The expected function signature and parameter types.\n",
+        "\n",
+        "    Returns:\n",
+        "        dict: The tool call dictionary with the arguments converted to the correct types if necessary.\n",
+        "    \"\"\"\n",
+        "    properties = tool_signature[\"parameters\"][\"properties\"]\n",
+        "\n",
+        "    # TODO: This is overly simplified but enough for simple Tools.\n",
+        "    type_mapping = {\n",
+        "        \"int\": int,\n",
+        "        \"str\": str,\n",
+        "        \"bool\": bool,\n",
+        "        \"float\": float,\n",
+        "    }\n",
+        "\n",
+        "    for arg_name, arg_value in tool_call[\"arguments\"].items():\n",
+        "        expected_type = properties[arg_name].get(\"type\")\n",
+        "\n",
+        "        if not isinstance(arg_value, type_mapping[expected_type]):\n",
+        "            tool_call[\"arguments\"][arg_name] = type_mapping[expected_type](arg_value)\n",
+        "\n",
+        "    return tool_call\n",
+        "\n",
+        "\n",
+        "class Tool:\n",
+        "    \"\"\"\n",
+        "    A class representing a tool that wraps a callable and its signature.\n",
+        "\n",
+        "    Attributes:\n",
+        "        name (str): The name of the tool (function).\n",
+        "        fn (Callable): The function that the tool represents.\n",
+        "        fn_signature (str): JSON string representation of the function's signature.\n",
+        "    \"\"\"\n",
+        "\n",
+        "    def __init__(self, name: str, fn: Callable, fn_signature: str):\n",
+        "        self.name = name\n",
+        "        self.fn = fn\n",
+        "        self.fn_signature = fn_signature\n",
+        "\n",
+        "    def __str__(self):\n",
+        "        return self.fn_signature\n",
+        "\n",
+        "    def run(self, **kwargs):\n",
+        "        \"\"\"\n",
+        "        Executes the tool (function) with provided arguments.\n",
+        "\n",
+        "        Args:\n",
+        "            **kwargs: Keyword arguments passed to the function.\n",
+        "\n",
+        "        Returns:\n",
+        "            The result of the function call.\n",
+        "        \"\"\"\n",
+        "        return self.fn(**kwargs)\n",
+        "\n",
+        "\n",
+        "def tool(fn: Callable):\n",
+        "    \"\"\"\n",
+        "    A decorator that wraps a function into a Tool object.\n",
+        "\n",
+        "    Args:\n",
+        "        fn (Callable): The function to be wrapped.\n",
+        "\n",
+        "    Returns:\n",
+        "        Tool: A Tool object containing the function, its name, and its signature.\n",
+        "    \"\"\"\n",
+        "\n",
+        "    def wrapper():\n",
+        "        fn_signature = get_fn_signature(fn)\n",
+        "        return Tool(\n",
+        "            name=fn_signature.get(\"name\"), fn=fn, fn_signature=json.dumps(fn_signature)\n",
+        "        )\n",
+        "\n",
+        "    return wrapper()"
+      ],
+      "metadata": {
+        "id": "W2_3eEm-NZpZ"
+      },
+      "execution_count": 22,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import json\n",
+        "import requests\n",
+        "\n",
+        "@tool\n",
+        "def hn_tool(top_n: int):\n",
+        "    \"\"\"\n",
+        "    Fetch the top stories from Hacker News.\n",
+        "\n",
+        "    This function retrieves the top `top_n` stories from Hacker News using the Hacker News API.\n",
+        "    Each story contains the title, URL, score, author, and time of submission. The data is fetched\n",
+        "    from the official Firebase Hacker News API, which returns story details in JSON format.\n",
+        "\n",
+        "    Args:\n",
+        "        top_n (int): The number of top stories to retrieve.\n",
+        "    \"\"\"\n",
+        "    top_stories_url = 'https://hacker-news.firebaseio.com/v0/topstories.json'\n",
+        "\n",
+        "    try:\n",
+        "        response = requests.get(top_stories_url)\n",
+        "        response.raise_for_status()  # Check for HTTP errors\n",
+        "\n",
+        "        # Get the top story IDs\n",
+        "        top_story_ids = response.json()[:top_n]\n",
+        "\n",
+        "        top_stories = []\n",
+        "\n",
+        "        # For each story ID, fetch the story details\n",
+        "        for story_id in top_story_ids:\n",
+        "            story_url = f'https://hacker-news.firebaseio.com/v0/item/{story_id}.json'\n",
+        "            story_response = requests.get(story_url)\n",
+        "            story_response.raise_for_status()  # Check for HTTP errors\n",
+        "            story_data = story_response.json()\n",
+        "\n",
+        "            # Append the story title and URL (or other relevant info) to the list\n",
+        "            top_stories.append({\n",
+        "                'title': story_data.get('title', 'No title'),\n",
+        "                'url': story_data.get('url', 'No URL available'),\n",
+        "            })\n",
+        "\n",
+        "        return json.dumps(top_stories)\n",
+        "\n",
+        "    except requests.exceptions.RequestException as e:\n",
+        "        print(f\"An error occurred: {e}\")\n",
+        "        return []"
+      ],
+      "metadata": {
+        "id": "Ojuik8kMS2hY"
+      },
+      "execution_count": 32,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "hn_tool\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xmmwXRPWSbBx",
+        "outputId": "19ee4b8a-8b4d-40b9-c2e8-d88e42169510"
+      },
+      "execution_count": 33,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<__main__.Tool at 0x7d8aa928ff80>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 33
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "hn_tool.name"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 35
+        },
+        "id": "ov1k6fpSScOf",
+        "outputId": "d3e0f81a-1cfb-46bb-ba90-6a60091e6ba3"
+      },
+      "execution_count": 34,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "'hn_tool'"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 34
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "json.loads(hn_tool.fn_signature)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "35grHQsRSd20",
+        "outputId": "18704fdc-8eb5-4e39-cf79-c7c9c9d6f7d0"
+      },
+      "execution_count": 35,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "{'name': 'hn_tool',\n",
+              " 'description': '\\n    Fetch the top stories from Hacker News.\\n\\n    This function retrieves the top `top_n` stories from Hacker News using the Hacker News API.\\n    Each story contains the title, URL, score, author, and time of submission. The data is fetched\\n    from the official Firebase Hacker News API, which returns story details in JSON format.\\n\\n    Args:\\n        top_n (int): The number of top stories to retrieve.\\n    ',\n",
+              " 'parameters': {'properties': {'top_n': {'type': 'int'}}}}"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 35
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# @title\n",
+        "\"\"\"\n",
+        "This is a collection of helper functions and methods we are going to use in\n",
+        "the Agent implementation. You don't need to know the specific implementation\n",
+        "of these to follow the Agent code. But, if you are curious, feel free to check\n",
+        "them out.\n",
+        "\"\"\"\n",
+        "\n",
+        "import re\n",
+        "import time\n",
+        "\n",
+        "from colorama import Fore\n",
+        "from colorama import Style\n",
+        "\n",
+        "from dataclasses import dataclass\n",
+        "\n",
+        "\n",
+        "def completions_create(client, messages: list, model: str) -> str:\n",
+        "    \"\"\"\n",
+        "    Sends a request to the client's `completions.create` method to interact with the language model.\n",
+        "\n",
+        "    Args:\n",
+        "        client (OpenAI): The OpenAI client object\n",
+        "        messages (list[dict]): A list of message objects containing chat history for the model.\n",
+        "        model (str): The model to use for generating tool calls and responses.\n",
+        "\n",
+        "    Returns:\n",
+        "        str: The content of the model's response.\n",
+        "    \"\"\"\n",
+        "    response = client.chat.completions.create(messages=messages, model=model)\n",
+        "    return str(response.choices[0].message.content)\n",
+        "\n",
+        "\n",
+        "def build_prompt_structure(prompt: str, role: str, tag: str = \"\") -> dict:\n",
+        "    \"\"\"\n",
+        "    Builds a structured prompt that includes the role and content.\n",
+        "\n",
+        "    Args:\n",
+        "        prompt (str): The actual content of the prompt.\n",
+        "        role (str): The role of the speaker (e.g., user, assistant).\n",
+        "\n",
+        "    Returns:\n",
+        "        dict: A dictionary representing the structured prompt.\n",
+        "    \"\"\"\n",
+        "    if tag:\n",
+        "        prompt = f\"<{tag}>{prompt}</{tag}>\"\n",
+        "    return {\"role\": role, \"content\": prompt}\n",
+        "\n",
+        "def update_chat_history(history: list, msg: str, role: str):\n",
+        "    \"\"\"\n",
+        "    Updates the chat history by appending the latest response.\n",
+        "\n",
+        "    Args:\n",
+        "        history (list): The list representing the current chat history.\n",
+        "        msg (str): The message to append.\n",
+        "        role (str): The role type (e.g. 'user', 'assistant', 'system')\n",
+        "    \"\"\"\n",
+        "    history.append(build_prompt_structure(prompt=msg, role=role))\n",
+        "\n",
+        "\n",
+        "class ChatHistory(list):\n",
+        "    def __init__(self, messages: list | None = None, total_length: int = -1):\n",
+        "        \"\"\"Initialise the queue with a fixed total length.\n",
+        "\n",
+        "        Args:\n",
+        "            messages (list | None): A list of initial messages\n",
+        "            total_length (int): The maximum number of messages the chat history can hold.\n",
+        "        \"\"\"\n",
+        "        if messages is None:\n",
+        "            messages = []\n",
+        "\n",
+        "        super().__init__(messages)\n",
+        "        self.total_length = total_length\n",
+        "\n",
+        "    def append(self, msg: str):\n",
+        "        \"\"\"Add a message to the queue.\n",
+        "\n",
+        "        Args:\n",
+        "            msg (str): The message to be added to the queue\n",
+        "        \"\"\"\n",
+        "        if len(self) == self.total_length:\n",
+        "            self.pop(0)\n",
+        "        super().append(msg)\n",
+        "\n",
+        "\n",
+        "\n",
+        "class FixedFirstChatHistory(ChatHistory):\n",
+        "    def __init__(self, messages: list | None = None, total_length: int = -1):\n",
+        "        \"\"\"Initialise the queue with a fixed total length.\n",
+        "\n",
+        "        Args:\n",
+        "            messages (list | None): A list of initial messages\n",
+        "            total_length (int): The maximum number of messages the chat history can hold.\n",
+        "        \"\"\"\n",
+        "        super().__init__(messages, total_length)\n",
+        "\n",
+        "    def append(self, msg: str):\n",
+        "        \"\"\"Add a message to the queue. The first messaage will always stay fixed.\n",
+        "\n",
+        "        Args:\n",
+        "            msg (str): The message to be added to the queue\n",
+        "        \"\"\"\n",
+        "        if len(self) == self.total_length:\n",
+        "            self.pop(1)\n",
+        "        super().append(msg)\n",
+        "\n",
+        "def fancy_print(message: str) -> None:\n",
+        "    \"\"\"\n",
+        "    Displays a fancy print message.\n",
+        "\n",
+        "    Args:\n",
+        "        message (str): The message to display.\n",
+        "    \"\"\"\n",
+        "    print(Style.BRIGHT + Fore.CYAN + f\"\\n{'=' * 50}\")\n",
+        "    print(Fore.MAGENTA + f\"{message}\")\n",
+        "    print(Style.BRIGHT + Fore.CYAN + f\"{'=' * 50}\\n\")\n",
+        "    time.sleep(0.5)\n",
+        "\n",
+        "\n",
+        "def fancy_step_tracker(step: int, total_steps: int) -> None:\n",
+        "    \"\"\"\n",
+        "    Displays a fancy step tracker for each iteration of the generation-reflection loop.\n",
+        "\n",
+        "    Args:\n",
+        "        step (int): The current step in the loop.\n",
+        "        total_steps (int): The total number of steps in the loop.\n",
+        "    \"\"\"\n",
+        "    fancy_print(f\"STEP {step + 1}/{total_steps}\")\n",
+        "\n",
+        "\n",
+        "@dataclass\n",
+        "class TagContentResult:\n",
+        "    \"\"\"\n",
+        "    A data class to represent the result of extracting tag content.\n",
+        "\n",
+        "    Attributes:\n",
+        "        content (List[str]): A list of strings containing the content found between the specified tags.\n",
+        "        found (bool): A flag indicating whether any content was found for the given tag.\n",
+        "    \"\"\"\n",
+        "\n",
+        "    content: list[str]\n",
+        "    found: bool\n",
+        "\n",
+        "\n",
+        "def extract_tag_content(text: str, tag: str) -> TagContentResult:\n",
+        "    \"\"\"\n",
+        "    Extracts all content enclosed by specified tags (e.g., <thought>, <response>, etc.).\n",
+        "\n",
+        "    Parameters:\n",
+        "        text (str): The input string containing multiple potential tags.\n",
+        "        tag (str): The name of the tag to search for (e.g., 'thought', 'response').\n",
+        "\n",
+        "    Returns:\n",
+        "        dict: A dictionary with the following keys:\n",
+        "            - 'content' (list): A list of strings containing the content found between the specified tags.\n",
+        "            - 'found' (bool): A flag indicating whether any content was found for the given tag.\n",
+        "    \"\"\"\n",
+        "    # Build the regex pattern dynamically to find multiple occurrences of the tag\n",
+        "    tag_pattern = rf\"<{tag}>(.*?)</{tag}>\"\n",
+        "\n",
+        "    # Use findall to capture all content between the specified tag\n",
+        "    matched_contents = re.findall(tag_pattern, text, re.DOTALL)\n",
+        "\n",
+        "    # Return the dataclass instance with the result\n",
+        "    return TagContentResult(\n",
+        "        content=[content.strip() for content in matched_contents],\n",
+        "        found=bool(matched_contents),\n",
+        "    )\n"
+      ],
+      "metadata": {
+        "id": "g7PS0P7aOHAz"
+      },
+      "execution_count": 36,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import json\n",
+        "import re\n",
+        "\n",
+        "from colorama import Fore\n",
+        "from openai import OpenAI\n",
+        "\n",
+        "\n",
+        "TOOL_SYSTEM_PROMPT = \"\"\"\n",
+        "You are a function calling AI model. You are provided with function signatures within <tools></tools> XML tags.\n",
+        "You may call one or more functions to assist with the user query. Don't make assumptions about what values to plug\n",
+        "into functions. Pay special attention to the properties 'types'. You should use those types as in a Python dict.\n",
+        "For each function call return a json object with function name and arguments within <tool_call></tool_call>\n",
+        "XML tags as follows:\n",
+        "\n",
+        "<tool_call>\n",
+        "{\"name\": <function-name>,\"arguments\": <args-dict>,  \"id\": <monotonically-increasing-id>}\n",
+        "</tool_call>\n",
+        "\n",
+        "Here are the available tools:\n",
+        "\n",
+        "<tools>\n",
+        "%s\n",
+        "</tools>\n",
+        "\n",
+        "If the user asks about something related to the tool, always provide the tool call.\n",
+        "Don't say that you can't access realtime information if you have a tool to achieve that.\n",
+        "\"\"\"\n",
+        "\n",
+        "\n",
+        "class ToolAgent:\n",
+        "    \"\"\"\n",
+        "    The ToolAgent class represents an agent that can interact with a language model and use tools\n",
+        "    to assist with user queries. It generates function calls based on user input, validates arguments,\n",
+        "    and runs the respective tools.\n",
+        "\n",
+        "    Attributes:\n",
+        "        tools (Tool | list[Tool]): A list of tools available to the agent.\n",
+        "        model (str): The model to be used for generating tool calls and responses.\n",
+        "        client (OpenAI): The OpenAI client used to interact with the language model.\n",
+        "        tools_dict (dict): A dictionary mapping tool names to their corresponding Tool objects.\n",
+        "    \"\"\"\n",
+        "\n",
+        "    def __init__(\n",
+        "        self,\n",
+        "        tools: Tool | list[Tool],\n",
+        "        model: str = \"gpt-4o-mini\",\n",
+        "    ) -> None:\n",
+        "        self.client = OpenAI(\n",
+        "            api_key=userdata.get('OPENAI_API_KEY')\n",
+        "        )\n",
+        "        self.model = model\n",
+        "        self.tools = tools if isinstance(tools, list) else [tools]\n",
+        "        self.tools_dict = {tool.name: tool for tool in self.tools}\n",
+        "\n",
+        "    def add_tool_signatures(self) -> str:\n",
+        "        \"\"\"\n",
+        "        Collects the function signatures of all available tools.\n",
+        "\n",
+        "        Returns:\n",
+        "            str: A concatenated string of all tool function signatures in JSON format.\n",
+        "        \"\"\"\n",
+        "        return \"\".join([tool.fn_signature for tool in self.tools])\n",
+        "\n",
+        "    def process_tool_calls(self, tool_calls_content: list) -> dict:\n",
+        "        \"\"\"\n",
+        "        Processes each tool call, validates arguments, executes the tools, and collects results.\n",
+        "\n",
+        "        Args:\n",
+        "            tool_calls_content (list): List of strings, each representing a tool call in JSON format.\n",
+        "\n",
+        "        Returns:\n",
+        "            dict: A dictionary where the keys are tool call IDs and values are the results from the tools.\n",
+        "        \"\"\"\n",
+        "        observations = {}\n",
+        "        for tool_call_str in tool_calls_content:\n",
+        "            tool_call = json.loads(tool_call_str)\n",
+        "            tool_name = tool_call[\"name\"]\n",
+        "            tool = self.tools_dict[tool_name]\n",
+        "\n",
+        "            print(Fore.GREEN + f\"\\nUsing Tool: {tool_name}\")\n",
+        "\n",
+        "            # Validate and execute the tool call\n",
+        "            validated_tool_call = validate_arguments(\n",
+        "                tool_call, json.loads(tool.fn_signature)\n",
+        "            )\n",
+        "            print(Fore.GREEN + f\"\\nTool call dict: \\n{validated_tool_call}\")\n",
+        "\n",
+        "            result = tool.run(**validated_tool_call[\"arguments\"])\n",
+        "            print(Fore.GREEN + f\"\\nTool result: \\n{result}\")\n",
+        "\n",
+        "            # Store the result using the tool call ID\n",
+        "            observations[validated_tool_call[\"id\"]] = result\n",
+        "\n",
+        "        return observations\n",
+        "\n",
+        "    def run(\n",
+        "        self,\n",
+        "        user_msg: str,\n",
+        "    ) -> str:\n",
+        "        \"\"\"\n",
+        "        Handles the full process of interacting with the language model and executing a tool based on user input.\n",
+        "\n",
+        "        Args:\n",
+        "            user_msg (str): The user's message that prompts the tool agent to act.\n",
+        "\n",
+        "        Returns:\n",
+        "            str: The final output after executing the tool and generating a response from the model.\n",
+        "        \"\"\"\n",
+        "        user_prompt = build_prompt_structure(prompt=user_msg, role=\"user\")\n",
+        "\n",
+        "        tool_chat_history = ChatHistory(\n",
+        "            [\n",
+        "                build_prompt_structure(\n",
+        "                    prompt=TOOL_SYSTEM_PROMPT % self.add_tool_signatures(),\n",
+        "                    role=\"system\",\n",
+        "                ),\n",
+        "                user_prompt,\n",
+        "            ]\n",
+        "        )\n",
+        "        agent_chat_history = ChatHistory([user_prompt])\n",
+        "\n",
+        "        tool_call_response = completions_create(\n",
+        "            self.client, messages=tool_chat_history, model=self.model\n",
+        "        )\n",
+        "        tool_calls = extract_tag_content(str(tool_call_response), \"tool_call\")\n",
+        "\n",
+        "        if tool_calls.found:\n",
+        "            observations = self.process_tool_calls(tool_calls.content)\n",
+        "            update_chat_history(\n",
+        "                agent_chat_history, f'f\"Observation: {observations}\"', \"user\"\n",
+        "            )\n",
+        "\n",
+        "        return completions_create(self.client, agent_chat_history, self.model)\n"
+      ],
+      "metadata": {
+        "id": "_XKBHj-xRs9v"
+      },
+      "execution_count": 37,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "tool_agent = ToolAgent(tools=[hn_tool])"
+      ],
+      "metadata": {
+        "id": "To4J9ysaR_h9"
+      },
+      "execution_count": 38,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "output = tool_agent.run(user_msg=\"Tell me your name\")"
+      ],
+      "metadata": {
+        "id": "jeGqPc_GSB4y"
+      },
+      "execution_count": 39,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(output)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "TOGWiDEWS7S1",
+        "outputId": "1776291d-e709-4d3b-b034-8c1c745fcd4d"
+      },
+      "execution_count": 40,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "I don't have a personal name, but you can call me Assistant! How can I help you today?\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "output = tool_agent.run(user_msg=\"Tell me the top 5 Hacker News stories\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "_6I7r-v1S8FE",
+        "outputId": "b2775582-4401-45fd-8381-1c87d396d7bb"
+      },
+      "execution_count": 41,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[32m\n",
+            "Using Tool: hn_tool\n",
+            "\u001b[32m\n",
+            "Tool call dict: \n",
+            "{'name': 'hn_tool', 'arguments': {'top_n': 5}, 'id': 1}\n",
+            "\u001b[32m\n",
+            "Tool result: \n",
+            "[{\"title\": \"OpenCode \\u2013 The open source AI coding agent\", \"url\": \"https://opencode.ai/\"}, {\"title\": \"Our commitment to Windows quality\", \"url\": \"https://blogs.windows.com/windows-insider/2026/03/20/our-commitment-to-windows-quality/\"}, {\"title\": \"A Japanese Glossary of Chopsticks Faux Pas\", \"url\": \"https://www.nippon.com/en/japan-data/h01362/\"}, {\"title\": \"France's aircraft carrier located in real time by Le Monde through fitness app\", \"url\": \"https://www.lemonde.fr/en/international/article/2026/03/20/stravaleaks-france-s-aircraft-carrier-located-in-real-time-by-le-monde-through-fitness-app_6751640_4.html\"}, {\"title\": \"Attention Residuals\", \"url\": \"https://github.com/MoonshotAI/Attention-Residuals\"}]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(output)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6R487ssnS97N",
+        "outputId": "ce1f8441-7af2-4aa6-ed95-3e019d60536f"
+      },
+      "execution_count": 42,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Here are the top 5 Hacker News stories based on the provided data:\n",
+            "\n",
+            "1. **[OpenCode – The open source AI coding agent](https://opencode.ai/)**\n",
+            "2. **[Our commitment to Windows quality](https://blogs.windows.com/windows-insider/2026/03/20/our-commitment-to-windows-quality/)**\n",
+            "3. **[A Japanese Glossary of Chopsticks Faux Pas](https://www.nippon.com/en/japan-data/h01362/)**\n",
+            "4. **[France's aircraft carrier located in real time by Le Monde through fitness app](https://www.lemonde.fr/en/international/article/2026/03/20/stravaleaks-france-s-aircraft-carrier-located-in-real-time-by-le-monde-through-fitness-app_6751640_4.html)**\n",
+            "5. **[Attention Residuals](https://github.com/MoonshotAI/Attention-Residuals)**\n",
+            "\n",
+            "Feel free to explore these stories for more information!\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "9aIF2o3KS-_v"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
